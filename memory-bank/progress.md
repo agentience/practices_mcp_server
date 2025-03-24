@@ -56,6 +56,14 @@
 - ⬜ Create version file templates
 - ⬜ Write tests for version management
 
+#### Pre-commit Hooks and License Headers (PMS-12)
+- ⬜ Extract pre-commit hooks configuration from Tribal
+- ⬜ Implement pre-commit hooks installation and management
+- ⬜ Implement license header management functionality
+- ⬜ Create MCP tools for hooks and headers
+- ⬜ Add LLM context instructions
+- ⬜ Write tests for hooks and headers functionality
+
 #### PR Preparation (PMS-5)
 - ⬜ Extract PR helper functionality from Tribal
 - ⬜ Implement PR description generation
@@ -119,8 +127,9 @@ The project has moved from the **initial implementation phase** to the **core fu
 ### Next Steps
 
 1. Add version management functionality (PMS-4)
-2. Develop PR preparation tools (PMS-5)
-3. Complete integrations with GitHub and Jira (PMS-6, PMS-7)
+2. Implement pre-commit hooks and license headers (PMS-12)
+3. Develop PR preparation tools (PMS-5)
+4. Complete integrations with GitHub and Jira (PMS-6, PMS-7)
 
 ## Known Issues
 
