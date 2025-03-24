@@ -118,6 +118,7 @@ The server is designed to be highly configurable through configuration files:
 # .practices.yaml
 project_type: python
 branching_strategy: gitflow
+workflow_mode: solo  # "solo" or "team"
 main_branch: main
 develop_branch: develop
 
@@ -252,6 +253,58 @@ The server uses a fallback pattern for configuration:
 3. Fall back to default templates
 
 This provides flexibility while ensuring sensible defaults.
+
+## Branching and Workflow Patterns
+
+### 1. Workflow Modes
+
+The server supports two workflow modes:
+
+- **Solo Mode**: For single developers or small teams
+  - Branch directly from and merge directly to base branches
+  - After merging, delete both local and remote feature branches
+  - Default mode if not specified
+
+- **Team Mode**: For larger teams or more formal processes
+  - Create pull requests for all merges
+  - After PR approval and merge, delete both local and remote feature branches
+
+### 2. Repository Initialization
+
+When initializing a Git repository:
+
+- Create `main` and `develop` branches
+- Set up default configuration based on project type
+- Configure branch protection if in team mode
+
+### 3. Branch Lifecycle
+
+The server manages the complete branch lifecycle:
+
+1. Branch creation from appropriate base
+2. Development on branch
+3. Branch validation before merge/PR
+4. Merge or PR creation
+5. Branch cleanup after merge
+
+### 4. Branch Naming Conventions
+
+Branches follow consistent naming conventions:
+
+- `feature/{ticket-id}-{description}` for new features
+- `bugfix/{ticket-id}-{description}` for non-critical bugs
+- `hotfix/{version}-{description}` for critical production fixes
+- `release/{version}` for release preparation
+- `docs/{description}` for documentation changes
+
+### 5. Version Management
+
+Version changes are determined by branch type:
+
+- Feature branches don't change version
+- Bugfix branches don't change version
+- Release branches bump minor or major version
+- Hotfix branches bump patch version
 
 ## Communication Patterns
 

@@ -44,6 +44,29 @@ def create_parser() -> argparse.ArgumentParser:
         "--description", "-d", help="Short description for the branch"
     )
 
+    merge_branch_parser = branch_subparsers.add_parser(
+        "merge", help="Merge a branch to its base branch"
+    )
+    merge_branch_parser.add_argument(
+        "branch_name", nargs="?", help="Name of the branch to merge (defaults to current branch)"
+    )
+    merge_branch_parser.add_argument(
+        "--no-delete", action="store_true", help="Don't delete the branch after merging"
+    )
+    merge_branch_parser.add_argument(
+        "--mode", choices=["solo", "team"], help="Workflow mode (defaults to configuration)"
+    )
+
+    cleanup_branch_parser = branch_subparsers.add_parser(
+        "cleanup", help="Delete a branch locally and remotely"
+    )
+    cleanup_branch_parser.add_argument(
+        "branch_name", help="Name of the branch to delete"
+    )
+    cleanup_branch_parser.add_argument(
+        "--force", "-f", action="store_true", help="Force deletion even if unmerged"
+    )
+
     # Version commands
     version_parser = subparsers.add_parser("version", help="Version operations")
     version_subparsers = version_parser.add_subparsers(dest="action", help="Action to perform")
@@ -101,6 +124,22 @@ def main(args: Optional[List[str]] = None) -> int:
             description = parsed_args.description or ""
             print(f"Creating {parsed_args.branch_type} branch for {ticket}: {description}")
             # TODO: Implement branch creation
+            return 0
+
+        elif parsed_args.action == "merge":
+            branch_name = parsed_args.branch_name or "current branch"
+            delete_after = not parsed_args.no_delete
+            mode = parsed_args.mode or "from config"
+            print(f"Merging branch {branch_name} (mode: {mode})")
+            if delete_after:
+                print(f"Will delete branch {branch_name} after successful merge")
+            # TODO: Implement branch merging
+            return 0
+
+        elif parsed_args.action == "cleanup":
+            force = parsed_args.force
+            print(f"Cleaning up branch {parsed_args.branch_name}" + (" (forced)" if force else ""))
+            # TODO: Implement branch cleanup
             return 0
 
     elif parsed_args.entity == "version":

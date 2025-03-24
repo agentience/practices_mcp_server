@@ -29,6 +29,14 @@ class PracticesServer:
                 },
             },
         )
+
+        # Default configuration
+        self.config = {
+            "workflow_mode": "solo",  # "solo" or "team"
+            "main_branch": "main",
+            "develop_branch": "develop",
+            "branching_strategy": "gitflow",
+        }
         self._register_tools()
         self._register_resources()
 
