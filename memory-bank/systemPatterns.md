@@ -364,6 +364,74 @@ def handle_github_webhook(event_type, payload):
 
 This enables integration with CI/CD systems and other tools.
 
+## Code Quality Patterns
+
+### 1. Pre-commit Hook Pattern
+
+The server provides a standardized approach to pre-commit hooks:
+
+```python
+class PreCommitHookManager:
+    def __init__(self, config):
+        self.config = config
+        self.hooks = self._load_hooks()
+
+    def _load_hooks(self):
+        # Load hooks based on configuration
+        return [...]
+
+    def install(self, repo_path):
+        # Install hooks in the repository
+        pass
+
+    def verify(self, repo_path):
+        # Verify hooks are properly installed
+        pass
+```
+
+This pattern ensures consistent code quality checks across projects.
+
+### 2. License Header Pattern
+
+The server uses a templating approach for license headers:
+
+```python
+class LicenseHeaderManager:
+    def __init__(self, config):
+        self.config = config
+        self.templates = self._load_templates()
+
+    def _load_templates(self):
+        # Load templates for different file types
+        return {...}
+
+    def add_header(self, file_path, description=None):
+        # Add header to the file
+        pass
+
+    def verify_header(self, file_path):
+        # Verify header exists and is correct
+        pass
+```
+
+This ensures all code files have proper licensing information.
+
+### 3. Git Repository Initialization Detection
+
+The server detects Git repository initialization to offer relevant functionality:
+
+```python
+def check_git_repo_initialization(path):
+    # Check if a Git repository was recently initialized
+    creation_time = get_git_dir_creation_time(path)
+    current_time = time.time()
+    
+    # If created within the last 5 minutes, consider it newly initialized
+    return (current_time - creation_time) < 300
+```
+
+This enables proactive assistance during repository setup.
+
 ## Testing Patterns
 
 ### 1. Mock Object Pattern

@@ -19,6 +19,7 @@ The Practices MCP Server is built using the following technology stack:
 - **Pytest**: For testing
 - **Bump2version**: For version management
 - **MCP SDK**: For MCP server implementation
+- **pre-commit**: For pre-commit hooks installation and management
 
 ### External Integrations
 
