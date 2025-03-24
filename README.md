@@ -81,19 +81,40 @@ The server integrates with Jira to:
 ## Installation
 
 1. Clone the repository
-2. Install with pip: `pip install -e .`
+2. Create a virtual environment with `uv`:
+   ```bash
+   uv venv
+   source .venv/bin/activate
+   ```
+3. Install the package in development mode:
+   ```bash
+   uv pip install -e .
+   ```
+
+   Note: If you encounter issues with the `mcp-python-sdk` dependency, you may need to install it separately or use a workaround specific to your environment.
 
 ## Running the Server
 
 ```bash
+# Activate the virtual environment
+source .venv/bin/activate
+
 # Run the MCP server
 practices server
 ```
 
 ## Development
 
-1. Install development dependencies: `pip install -e ".[dev]"`
-2. Run tests: `python -m unittest discover tests`
+1. Create a virtual environment and install the package as described above
+2. Install development dependencies:
+   ```bash
+   uv pip install -e ".[dev]"
+   ```
+3. Run tests:
+   ```bash
+   # With the virtual environment activated
+   PYTHONPATH=./src python -m unittest discover tests
+   ```
 
 ## License
 
