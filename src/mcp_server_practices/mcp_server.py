@@ -4,11 +4,14 @@ MCP server implementation for development practices.
 """
 
 import sys
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, List
 
 from mcp_python_sdk import Server, StdioServerTransport
 
 from mcp_server_practices import __version__
+from mcp_server_practices.branch.validator import validate_branch_name as validate_branch
+from mcp_server_practices.branch.creator import create_branch as create_branch_func
+from mcp_server_practices.integrations.jira import update_issue_status
 
 
 class PracticesServer:
@@ -47,6 +50,18 @@ class PracticesServer:
             "callTool",
             {"name": "validate_branch_name"},
             self.validate_branch_name
+        )
+        
+        self.server.set_request_handler(
+            "callTool",
+            {"name": "create_branch"},
+            self.create_branch
+        )
+        
+        self.server.set_request_handler(
+            "callTool",
+            {"name": "get_branch_info"},
+            self.get_branch_info
         )
 
         # Version tools
@@ -87,17 +102,104 @@ class PracticesServer:
     async def validate_branch_name(self, request: Dict[str, Any]) -> Dict[str, Any]:
         """
         Validate a branch name against the configured branching strategy.
-
-        Placeholder implementation.
         """
         branch_name = request.get("arguments", {}).get("branch_name", "")
-
-        # TODO: Implement actual validation logic
+        
+        # Call the branch validator with our configuration
+        result = validate_branch(branch_name, self.config)
+        
+        if result["valid"]:
+            return {
+                "content": [
+                    {
+                        "type": "text",
+                        "text": f"Branch '{branch_name}' is valid. Type: {result['branch_type']}, Base branch: {result['base_branch']}",
+                    },
+                ],
+            }
+        else:
+            return {
+                "content": [
+                    {
+                        "type": "text",
+                        "text": f"Branch '{branch_name}' is invalid: {result['error']}. Expected patterns: {', '.join([f'{k}: {v}' for k, v in result['expected_patterns'].items()])}",
+                    },
+                ],
+                "isError": True
+            }
+            
+    async def create_branch(self, request: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Create a new branch following the branching convention.
+        """
+        args = request.get("arguments", {})
+        branch_type = args.get("branch_type", "")
+        identifier = args.get("identifier", "")
+        description = args.get("description", "")
+        update_jira = args.get("update_jira", True)
+        
+        # Convert description to list of words if it's a string
+        if isinstance(description, str):
+            description = description.split()
+        
+        # Create the branch
+        result = create_branch_func(branch_type, identifier, description, self.config)
+        
+        # If branch creation was successful and it's a feature/bugfix branch, update Jira
+        if result["success"] and update_jira and branch_type in ["feature", "bugfix"]:
+            jira_result = update_issue_status(identifier, "In Progress", self.config)
+            result["jira_update"] = jira_result
+        
+        # Format the response
+        if result["success"]:
+            return {
+                "content": [
+                    {
+                        "type": "text",
+                        "text": result["message"]
+                    },
+                ],
+            }
+        else:
+            return {
+                "content": [
+                    {
+                        "type": "text",
+                        "text": f"Error creating branch: {result.get('error', 'Unknown error')}"
+                    },
+                ],
+                "isError": True
+            }
+            
+    async def get_branch_info(self, request: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Get information about a branch based on its name.
+        """
+        branch_name = request.get("arguments", {}).get("branch_name", "")
+        
+        # Validate the branch to extract its information
+        result = validate_branch(branch_name, self.config)
+        
+        if not result["valid"]:
+            return {
+                "content": [
+                    {
+                        "type": "text",
+                        "text": f"Invalid branch name: {result['error']}"
+                    },
+                ],
+                "isError": True
+            }
+        
+        # Return the branch information
         return {
             "content": [
                 {
                     "type": "text",
-                    "text": f"Validation of branch '{branch_name}' not yet implemented",
+                    "text": f"Branch information for '{branch_name}':\n" +
+                            f"Type: {result['branch_type']}\n" +
+                            f"Base branch: {result['base_branch']}\n" +
+                            f"Components: {result['components']}"
                 },
             ],
         }

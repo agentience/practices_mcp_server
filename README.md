@@ -1,114 +1,99 @@
-# Practices MCP Server
+# MCP Server Practices
 
-An MCP server for development practices, branching strategies, versioning, and PR workflows.
+An MCP server that provides tools and resources for development practices.
 
-## Overview
+## Features
 
-The Practices MCP Server is designed to extract, standardize, and automate the development best practices currently implemented in the Tribal project. The server provides tools and resources for implementing branching strategies, versioning rules, PR workflows, and integration with services like GitHub and Jira.
+### Branch Management
 
-### Features
+The Practices MCP server provides tools for managing Git branches according to a standardized convention:
 
-- Branch management (validation, creation, information extraction)
-- Version management (consistency checking, version bumping)
-- PR workflows (description generation, preparation)
-- Integration with GitHub and Jira MCP servers
-- Customizable templates for different project types
+- **feature/PMS-123-brief-description**: Feature branches for new features (from develop)
+- **bugfix/PMS-123-brief-description**: Bug fix branches (from develop)
+- **hotfix/1.0.1-brief-description**: Hot fix branches for urgent fixes (from main)
+- **release/1.1.0**: Release branches for preparing releases (from develop)
+- **docs/update-readme**: Documentation branches (from develop)
 
-## Installation
+#### Via MCP Tools
 
-### Prerequisites
+The server provides the following MCP tools:
 
-- Python 3.9+
-- Git
+1. `validate_branch_name`: Validates a branch name against the configured convention
+2. `create_branch`: Creates a new branch following the convention
+3. `get_branch_info`: Gets information about a branch
 
-### Using pip
+Example:
+```python
+from mcp.tools import call_tool
 
-```bash
-pip install mcp-server-practices
+# Validate a branch name
+result = call_tool(
+    "practices", 
+    "validate_branch_name", 
+    {"branch_name": "feature/PMS-123-add-authentication"}
+)
+
+# Create a branch
+result = call_tool(
+    "practices", 
+    "create_branch", 
+    {
+        "branch_type": "feature",
+        "identifier": "PMS-123",
+        "description": "add-authentication",
+        "update_jira": True
+    }
+)
+
+# Get branch info
+result = call_tool(
+    "practices", 
+    "get_branch_info", 
+    {"branch_name": "feature/PMS-123-add-authentication"}
+)
 ```
 
-### Development Installation
+#### Via CLI
 
-```bash
-git clone git@github.com:agentience/practices_mcp_server.git
-cd practices_mcp_server
-pip install -e .
-```
-
-## Usage
-
-### Command Line Interface
-
-The package provides a `practices` command-line tool:
+The package also provides a command-line interface:
 
 ```bash
 # Validate a branch name
-practices branch validate feature/PMS-123-add-feature
+practices branch validate feature/PMS-123-add-authentication
 
-# Create a new branch
-practices branch create feature --ticket PMS-123 --description "Add new feature"
+# Create a branch
+practices branch create feature PMS-123 add authentication
 
-# Validate version consistency
-practices version validate
+# Create a branch and update Jira status
+practices branch create feature PMS-123 add authentication --update-jira
 
-# Bump version
-practices version bump minor
-
-# Prepare a PR
-practices pr prepare --open-browser
+# Create a branch using Jira summary as description
+practices branch create feature PMS-123 --fetch-jira
 ```
 
-### MCP Server
+### Integration with Jira
 
-To use as an MCP server, add the following to your MCP settings file:
+The server integrates with Jira to:
 
-```json
-{
-  "mcpServers": {
-    "practices": {
-      "command": "practices-server",
-      "args": [],
-      "env": {}
-    }
-  }
-}
-```
+1. Fetch issue summaries for use in branch names
+2. Update issue status when creating branches
 
-## Configuration
+## Installation
 
-Create a `.practices.yaml` file in your project root:
+1. Clone the repository
+2. Install with pip: `pip install -e .`
 
-```yaml
-project_type: python
-branching_strategy: gitflow
-main_branch: main
-develop_branch: develop
+## Running the Server
 
-version:
-  files:
-    - path: src/package/__init__.py
-      pattern: __version__ = "(\d+\.\d+\.\d+)"
-  use_bumpversion: true
-
-branches:
-  feature:
-    pattern: "feature/([A-Z]+-\d+)-(.+)"
-    base: develop
-    version_bump: null
-  # ... other branch types
+```bash
+# Run the MCP server
+practices server
 ```
 
 ## Development
 
-### Setup
-
-```bash
-# Install development dependencies
-pip install -e ".[dev]"
-
-# Run tests
-pytest
-```
+1. Install development dependencies: `pip install -e ".[dev]"`
+2. Run tests: `python -m unittest discover tests`
 
 ## License
 
