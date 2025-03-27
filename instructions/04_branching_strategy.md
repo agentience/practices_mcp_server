@@ -194,6 +194,36 @@ graph TD
    git push origin develop
    ```
 
+## Best Practices for Clean History
+
+While we use direct merges (with `--no-ff`) instead of rebasing, following these practices will help maintain a clean and understandable repository history:
+
+1. **Regular Integration**: Pull the latest changes from the base branch regularly during feature development:
+   ```
+   git checkout feature/PMS-XXX-brief-description
+   git pull origin develop
+   ```
+   This reduces potential merge conflicts and keeps your feature branch up-to-date.
+
+2. **Logical Commits**: Make sure commits within feature branches are logical and well-organized:
+   - Each commit should represent a single logical change
+   - Avoid "WIP" commits in the final history
+   - Break large changes into smaller, focused commits
+
+3. **Local History Cleanup**: Consider using interactive rebasing just within your feature branch (before pushing to remote) to clean up your commit history:
+   ```
+   git rebase -i HEAD~n  # Where n is the number of commits to review
+   ```
+   This allows you to squash related commits, fix commit messages, and remove unnecessary commits.
+
+4. **Descriptive Branch Names**: Use clear, descriptive branch names that align with our naming conventions and make the purpose immediately obvious.
+
+5. **Regular Cleanup**: Delete branches after they've been merged to keep the repository clean:
+   ```
+   git branch -d feature/PMS-XXX-brief-description
+   git push origin --delete feature/PMS-XXX-brief-description
+   ```
+
 ## Commit Message Guidelines
 
 1. **Format**: `PMS-XXX: Brief description of change`
