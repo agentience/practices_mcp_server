@@ -17,6 +17,10 @@ from mcp_server_practices.headers.manager import add_license_header, verify_lice
 from mcp_server_practices.version.validator import validate_version as validate_version_func
 from mcp_server_practices.version.validator import get_current_version
 from mcp_server_practices.version.bumper import bump_version as bump_version_func
+from mcp_server_practices.pr.generator import generate_pr_description as generate_pr_desc
+from mcp_server_practices.pr.generator import create_pull_request as create_pr
+from mcp_server_practices.pr.workflow import prepare_pr as prepare_pr_func
+from mcp_server_practices.pr.workflow import submit_pr as submit_pr_func
 
 
 class PracticesServer:
@@ -103,6 +107,24 @@ class PracticesServer:
             "callTool",
             {"name": "generate_pr_description"},
             self.generate_pr_description
+        )
+        
+        self.server.set_request_handler(
+            "callTool",
+            {"name": "prepare_pr"},
+            self.prepare_pr
+        )
+        
+        self.server.set_request_handler(
+            "callTool",
+            {"name": "submit_pr"},
+            self.submit_pr
+        )
+        
+        self.server.set_request_handler(
+            "callTool",
+            {"name": "create_pull_request"},
+            self.create_pull_request
         )
         
         # Pre-commit hooks tools
@@ -409,20 +431,142 @@ class PracticesServer:
     async def generate_pr_description(self, request: Dict[str, Any]) -> Dict[str, Any]:
         """
         Generate a PR description based on branch and configuration.
-
-        Placeholder implementation.
         """
         branch_name = request.get("arguments", {}).get("branch_name", "")
 
-        # TODO: Implement actual PR description generation
-        return {
-            "content": [
-                {
-                    "type": "text",
-                    "text": f"PR description for branch '{branch_name}' not yet implemented",
-                },
-            ],
-        }
+        # Call the PR description generator
+        result = generate_pr_desc(branch_name, self.config)
+        
+        if result.get("success", False):
+            return {
+                "content": [
+                    {
+                        "type": "text",
+                        "text": f"Generated PR description for '{branch_name}':\n\n{result['description']}"
+                    },
+                ],
+            }
+        else:
+            return {
+                "content": [
+                    {
+                        "type": "text",
+                        "text": f"Error generating PR description: {result.get('error', 'Unknown error')}"
+                    },
+                ],
+                "isError": True
+            }
+    
+    async def prepare_pr(self, request: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Prepare a pull request for the current or specified branch.
+        """
+        args = request.get("arguments", {})
+        branch_name = args.get("branch_name")
+        
+        # Call the PR preparation function
+        result = prepare_pr_func(branch_name, self.config)
+        
+        if result.get("success", False):
+            # Format warnings and suggestions if any
+            details = ""
+            if result.get("warnings"):
+                details += "\n\nWarnings:\n" + "\n".join([f"⚠️ {w}" for w in result["warnings"]])
+            if result.get("suggestions"):
+                details += "\n\nSuggestions:\n" + "\n".join([f"💡 {s}" for s in result["suggestions"]])
+            
+            return {
+                "content": [
+                    {
+                        "type": "text",
+                        "text": f"PR preparation for '{result['branch_name']}' completed.\n" +
+                                f"Base branch: {result['base_branch']}\n" +
+                                f"Title: {result['title']}\n" +
+                                f"Ready for submission: {result['ready']}" +
+                                details
+                    },
+                ],
+            }
+        else:
+            return {
+                "content": [
+                    {
+                        "type": "text",
+                        "text": f"Error preparing PR: {result.get('error', 'Unknown error')}"
+                    },
+                ],
+                "isError": True
+            }
+    
+    async def submit_pr(self, request: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Submit a pull request for the current or specified branch.
+        """
+        args = request.get("arguments", {})
+        branch_name = args.get("branch_name")
+        force = args.get("force", False)
+        
+        # Call the PR submission function
+        result = submit_pr_func(branch_name, force, self.config)
+        
+        if result.get("success", False):
+            return {
+                "content": [
+                    {
+                        "type": "text",
+                        "text": f"PR for '{result['branch_name']}' submitted successfully.\n" +
+                                f"Title: {result['title']}\n" +
+                                f"Base branch: {result['base_branch']}\n" +
+                                f"Pull request details: {result.get('pull_request', 'No details available')}"
+                    },
+                ],
+            }
+        else:
+            error_details = ""
+            if result.get("warnings"):
+                error_details += "\n\nWarnings:\n" + "\n".join([f"⚠️ {w}" for w in result["warnings"]])
+            if result.get("suggestions"):
+                error_details += "\n\nSuggestions:\n" + "\n".join([f"💡 {s}" for s in result["suggestions"]])
+            
+            return {
+                "content": [
+                    {
+                        "type": "text",
+                        "text": f"Error submitting PR: {result.get('error', 'Unknown error')}" + error_details
+                    },
+                ],
+                "isError": True
+            }
+    
+    async def create_pull_request(self, request: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Create a pull request on GitHub with generated description.
+        """
+        branch_name = request.get("arguments", {}).get("branch_name", "")
+        
+        # Call the create PR function
+        result = create_pr(branch_name, self.config)
+        
+        if result.get("success", False):
+            return {
+                "content": [
+                    {
+                        "type": "text",
+                        "text": f"Pull request created for '{result['branch_name']}'.\n" +
+                                f"Details: {result.get('pull_request', 'No details available')}"
+                    },
+                ],
+            }
+        else:
+            return {
+                "content": [
+                    {
+                        "type": "text",
+                        "text": f"Error creating pull request: {result.get('error', 'Unknown error')}"
+                    },
+                ],
+                "isError": True
+            }
         
     async def install_pre_commit_hooks(self, request: Dict[str, Any]) -> Dict[str, Any]:
         """

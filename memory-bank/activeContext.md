@@ -57,17 +57,28 @@ We have completed the following activities:
 
 ## Current Focus
 
-Our current focus is on **developing PR preparation tools** (PMS-5). We'll be working on:
+Our current focus is on **completing GitHub and Jira integrations** (PMS-6, PMS-7). We'll be working on:
 
-1. ⬜ Extracting PR helper functionality from Tribal
-2. ⬜ Implementing PR description generation
-3. ⬜ Creating PR templates for different branch types
-4. ⬜ Implementing PR preparation workflow
-5. ⬜ Writing tests for PR functionality
+1. ⬜ Implementing GitHub MCP adapter
+2. ⬜ Creating PR creation integration
+3. ⬜ Implementing branch management with GitHub
+4. ⬜ Expanding Jira issue management capabilities
+5. ⬜ Implementing issue linking capabilities
 
 ## Recent Decisions
 
-### 1. Implementation Language
+### 1. Branching Strategy Enhancements
+
+We have enhanced our branching strategy documentation with best practices for maintaining a clean repository history:
+- Regular integration with the base branch to reduce merge conflicts
+- Guidelines for creating logical, focused commits
+- Local history cleanup using interactive rebasing (before pushing)
+- Recommendations for descriptive branch names
+- Regular repository cleanup to remove merged branches
+
+We will continue to use the direct merge approach with `--no-ff` as documented, while following these practices to maintain a clean history.
+
+### 2. Implementation Language
 
 We have decided to implement the Practices MCP server in **Python**, the same language as Tribal. This has made it easier to extract and adapt the existing code, as seen with branch management and version management functionality.
 
@@ -107,7 +118,19 @@ We have decided to use **uv** for dependency management and virtual environments
 
 ## Active Considerations
 
-### 1. Code Migration Strategy
+### 1. Repository Maintenance
+
+We are actively maintaining a clean repository by:
+- Deleting feature branches after they are merged to develop
+- Following our documented branching strategy
+- Keeping only active branches in the repository
+
+Current active branches:
+- `main` (production)
+- `develop` (integration)
+- `feature/PMS-5-pr-preparation-tools` (current work)
+
+### 2. Code Migration Strategy
 
 We evaluated the branch management code from Tribal:
 - Refactored the branch validation logic for better testability
@@ -123,7 +146,16 @@ Our testing strategy includes:
 - End-to-end tests for complete workflows
 - Mocked tests for external dependencies
 
-We've implemented unit tests for the branch validator component with good coverage.
+We enforce a strict requirement that **all tests must pass** before a feature is considered complete. This is reflected in our PR preparation workflow, which automatically checks for passing tests before marking a PR as ready for submission.
+
+Key testing guidelines:
+- New features must have corresponding tests
+- Tests should cover both success and failure cases
+- Tests should validate edge cases
+- Test coverage should be maintained or improved
+- Tests are considered part of the feature implementation, not an optional add-on
+
+We've documented these test requirements in `docs/llm_context/pr_preparation_guide.md` to ensure all team members and clients understand the importance of this practice.
 
 ### 3. Deployment Strategy
 
@@ -147,7 +179,7 @@ The `mcp-python-sdk` dependency may not be readily available in public registrie
 
 ## Completed Tasks
 
-1. Implemented the MCP server framework (PMS-2) ✅
+1. Implemented the MCP server framework (PMS-2 - closed as duplicate of PMS-12) ✅
 2. Implemented branch management functionality (PMS-3) ✅
    - Branch validation with configurable patterns
    - Branch creation with standardized naming
@@ -171,12 +203,25 @@ The `mcp-python-sdk` dependency may not be readily available in public registrie
    - Tool definitions for self-documentation
    - Tests for hooks and headers components
 
+5. Implemented PR preparation tools (PMS-5) ✅
+   - PR templates for different branch types
+   - PR description generation from branch info
+   - PR workflow with readiness checks
+   - GitHub integration for PR submission
+   - Unit tests for PR functionality components
+   - Four new MCP tools in the server
+
+6. Enhanced project documentation ✅
+   - Added best practices for maintaining clean Git history
+   - Updated branching strategy documentation
+   - Demonstrated proper branch cleanup
+
 ## Next Steps
 
-1. Develop PR preparation tools (PMS-5)
-2. Complete integrations with GitHub and Jira (PMS-6, PMS-7)
-3. Implement configuration system (PMS-8)
-4. Create strategy templates (PMS-9)
+1. Complete integrations with GitHub and Jira (PMS-6, PMS-7)
+2. Implement configuration system (PMS-8)
+3. Create strategy templates (PMS-9)
+4. Implement CLI commands for PR and version features (PMS-10)
 
 ## Key Stakeholders
 
@@ -194,7 +239,7 @@ N/A
 The implementation is following the phased approach outlined in the implementation plan:
 
 1. Initial Setup and Core Structure (PMS-1, PMS-2) - Completed ✅
-2. Core Functionality Implementation (PMS-3, PMS-4, PMS-5, PMS-12) - PMS-3, PMS-4, PMS-12 Completed ✅
+2. Core Functionality Implementation (PMS-3, PMS-4, PMS-5, PMS-12) - Completed ✅
 3. Integration Implementation (PMS-6, PMS-7)
 4. Configuration and Templates (PMS-8, PMS-9)
 5. CLI and User Experience (PMS-10, PMS-11)

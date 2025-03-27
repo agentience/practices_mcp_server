@@ -131,6 +131,51 @@ def get_tool_definitions() -> List[Dict[str, Any]]:
                 "required": ["branch_name"]
             }
         },
+        {
+            "name": "prepare_pr",
+            "description": "Prepare a pull request for the current or specified branch",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "branch_name": {
+                        "type": "string",
+                        "description": "Name of the branch for the PR (defaults to current branch)"
+                    }
+                }
+            }
+        },
+        {
+            "name": "submit_pr",
+            "description": "Submit a pull request for the current or specified branch",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "branch_name": {
+                        "type": "string",
+                        "description": "Name of the branch for the PR (defaults to current branch)"
+                    },
+                    "force": {
+                        "type": "boolean",
+                        "description": "Force submission even if there are warnings",
+                        "default": false
+                    }
+                }
+            }
+        },
+        {
+            "name": "create_pull_request",
+            "description": "Create a pull request on GitHub with generated description",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "branch_name": {
+                        "type": "string",
+                        "description": "Name of the branch for the PR"
+                    }
+                },
+                "required": ["branch_name"]
+            }
+        },
         
         # Pre-commit hooks tools
         {

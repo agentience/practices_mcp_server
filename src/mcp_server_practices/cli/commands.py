@@ -29,6 +29,245 @@ def run_mcp_server(arg_list: List[str]) -> int:
     return main()
 
 
+def install_hooks_command(arg_list: List[str]) -> int:
+    """
+    Install pre-commit hooks in a Git repository.
+    
+    Args:
+        arg_list: Command-line arguments
+        
+    Returns:
+        Exit code
+    """
+    parser = argparse.ArgumentParser(
+        description="Install pre-commit hooks in a Git repository"
+    )
+    
+    # Repository path argument
+    parser.add_argument(
+        "--path",
+        default=".",
+        help="Path to the Git repository (default: current directory)",
+    )
+    
+    # Project type
+    parser.add_argument(
+        "--project-type",
+        choices=["python", "javascript", "typescript"],
+        help="Type of project for specialized hooks",
+    )
+    
+    # Parse arguments
+    args = parser.parse_args(arg_list)
+    
+    # Load configuration from .practices.yaml (not implemented yet)
+    config = {
+        "project_type": args.project_type or "",
+    }
+    
+    # Install hooks
+    from mcp_server_practices.hooks.installer import install_hooks
+    result = install_hooks(args.path, config)
+    
+    if result["success"]:
+        print(result["message"])
+        if "output" in result:
+            print(result["output"])
+        return 0
+    else:
+        print(f"Error: {result.get('error', 'Unknown error')}")
+        return 1
+
+
+def update_hooks_command(arg_list: List[str]) -> int:
+    """
+    Update pre-commit hooks in a Git repository.
+    
+    Args:
+        arg_list: Command-line arguments
+        
+    Returns:
+        Exit code
+    """
+    parser = argparse.ArgumentParser(
+        description="Update pre-commit hooks in a Git repository"
+    )
+    
+    # Repository path argument
+    parser.add_argument(
+        "--path",
+        default=".",
+        help="Path to the Git repository (default: current directory)",
+    )
+    
+    # Parse arguments
+    args = parser.parse_args(arg_list)
+    
+    # Update hooks
+    from mcp_server_practices.hooks.installer import update_hooks
+    result = update_hooks(args.path)
+    
+    if result["success"]:
+        print(result["message"])
+        if "output" in result:
+            print(result["output"])
+        return 0
+    else:
+        print(f"Error: {result.get('error', 'Unknown error')}")
+        return 1
+
+
+def add_header_command(arg_list: List[str]) -> int:
+    """
+    Add a license header to a file.
+    
+    Args:
+        arg_list: Command-line arguments
+        
+    Returns:
+        Exit code
+    """
+    parser = argparse.ArgumentParser(
+        description="Add a license header to a file"
+    )
+    
+    # File path argument
+    parser.add_argument(
+        "filename",
+        help="Path to the file",
+    )
+    
+    # Description
+    parser.add_argument(
+        "--description",
+        default="",
+        help="Description of the file's purpose",
+    )
+    
+    # Parse arguments
+    args = parser.parse_args(arg_list)
+    
+    # Add header
+    from mcp_server_practices.headers.manager import add_license_header
+    result = add_license_header(args.filename, args.description)
+    
+    if result["success"]:
+        print(result["message"])
+        return 0
+    else:
+        print(f"Error: {result.get('error', 'Unknown error')}")
+        return 1
+
+
+def verify_header_command(arg_list: List[str]) -> int:
+    """
+    Check if a file has a proper license header.
+    
+    Args:
+        arg_list: Command-line arguments
+        
+    Returns:
+        Exit code
+    """
+    parser = argparse.ArgumentParser(
+        description="Check if a file has a proper license header"
+    )
+    
+    # File path argument
+    parser.add_argument(
+        "filename",
+        help="Path to the file",
+    )
+    
+    # Parse arguments
+    args = parser.parse_args(arg_list)
+    
+    # Verify header
+    from mcp_server_practices.headers.manager import verify_license_header
+    result = verify_license_header(args.filename)
+    
+    print(result["message"])
+    return 0 if result.get("has_header", False) else 1
+
+
+def batch_headers_command(arg_list: List[str]) -> int:
+    """
+    Process multiple files to add or check license headers.
+    
+    Args:
+        arg_list: Command-line arguments
+        
+    Returns:
+        Exit code
+    """
+    parser = argparse.ArgumentParser(
+        description="Process multiple files to add or check license headers"
+    )
+    
+    # Directory path argument
+    parser.add_argument(
+        "directory",
+        help="Path to the directory",
+    )
+    
+    # File pattern
+    parser.add_argument(
+        "--pattern",
+        default="*.py",
+        help="File pattern to match (default: *.py)",
+    )
+    
+    # Check only
+    parser.add_argument(
+        "--check",
+        action="store_true",
+        help="Only check for headers without adding them",
+    )
+    
+    # Description
+    parser.add_argument(
+        "--description",
+        default="",
+        help="Description to use for headers",
+    )
+    
+    # Recursive
+    parser.add_argument(
+        "--recursive",
+        action="store_true",
+        help="Process subdirectories recursively",
+    )
+    
+    # Parse arguments
+    args = parser.parse_args(arg_list)
+    
+    # Process files
+    from mcp_server_practices.headers.manager import process_files_batch
+    result = process_files_batch(
+        args.directory,
+        args.pattern,
+        args.check,
+        args.description,
+        args.recursive
+    )
+    
+    if result["success"]:
+        action = "Checked" if args.check else "Processed"
+        print(f"{action} {result['total_files']} files.")
+        print(f"Missing headers: {result['missing_headers']}")
+        
+        if not args.check:
+            print(f"Modified files: {result['modified_files']}")
+            
+        print(f"Errors: {result['errors']}")
+        
+        # Return non-zero if any files are missing headers
+        return 1 if args.check and result["missing_headers"] > 0 else 0
+    else:
+        print(f"Error: {result.get('error', 'Unknown error')}")
+        return 1
+
+
 def create_branch_command(arg_list: List[str]) -> int:
     """
     Create a new branch following the configured branching convention.
@@ -186,6 +425,136 @@ def validate_branch_command(arg_list: List[str]) -> int:
         return 1
 
 
+def version_validate_command(arg_list: List[str]) -> int:
+    """
+    Validate version consistency across files.
+    
+    Args:
+        arg_list: Command-line arguments
+        
+    Returns:
+        Exit code
+    """
+    parser = argparse.ArgumentParser(
+        description="Validate version consistency across files"
+    )
+    
+    # Parse arguments
+    args = parser.parse_args(arg_list)
+    
+    # Load configuration from .practices.yaml (not implemented yet)
+    config = {}
+    
+    # Import the version validator
+    from mcp_server_practices.version.validator import validate_version
+    result = validate_version(config)
+    
+    if result["valid"]:
+        print(f"Version consistency validated. Current version: {result['version']}")
+        return 0
+    else:
+        print(f"Version validation failed: {result.get('error', 'Unknown error')}")
+        print("\nFile details:")
+        for file_result in result.get("file_results", []):
+            if file_result.get("valid", False):
+                print(f"✅ {file_result['path']}: {file_result.get('version', 'unknown')}")
+            else:
+                print(f"❌ {file_result['path']}: {file_result.get('error', 'Unknown error')}")
+        return 1
+
+
+def version_get_command(arg_list: List[str]) -> int:
+    """
+    Get the current version of the project.
+    
+    Args:
+        arg_list: Command-line arguments
+        
+    Returns:
+        Exit code
+    """
+    parser = argparse.ArgumentParser(
+        description="Get the current version of the project"
+    )
+    
+    # Parse arguments
+    args = parser.parse_args(arg_list)
+    
+    # Load configuration from .practices.yaml (not implemented yet)
+    config = {}
+    
+    # Import the version getter
+    from mcp_server_practices.version.validator import get_current_version
+    version = get_current_version(config)
+    
+    if version:
+        print(f"Current version: {version}")
+        return 0
+    else:
+        print("Could not determine current version")
+        return 1
+
+
+def version_bump_command(arg_list: List[str]) -> int:
+    """
+    Bump the version according to semantic versioning.
+    
+    Args:
+        arg_list: Command-line arguments
+        
+    Returns:
+        Exit code
+    """
+    parser = argparse.ArgumentParser(
+        description="Bump the version according to semantic versioning"
+    )
+    
+    # Part argument
+    parser.add_argument(
+        "part",
+        choices=["major", "minor", "patch", "prerelease"],
+        help="Part of the version to bump",
+    )
+    
+    # Option to use bump2version
+    parser.add_argument(
+        "--use-bumpversion",
+        action="store_true",
+        help="Use bump2version tool instead of manual file updates",
+    )
+    
+    # Parse arguments
+    args = parser.parse_args(arg_list)
+    
+    # Load configuration from .practices.yaml (not implemented yet)
+    config = {
+        "version": {
+            "use_bumpversion": args.use_bumpversion
+        }
+    }
+    
+    # Import the version bumper
+    from mcp_server_practices.version.bumper import bump_version
+    result = bump_version(args.part, config)
+    
+    if result["success"]:
+        print(result["message"])
+        
+        # Print updated files if available
+        if "updated_files" in result:
+            print("\nUpdated files:")
+            for file in result["updated_files"]:
+                if file["success"]:
+                    print(f"✅ {file['path']}")
+                else:
+                    print(f"❌ {file['path']}: {file.get('error', 'Failed')}")
+        
+        return 0
+    else:
+        print(f"Error bumping version: {result.get('error', 'Unknown error')}")
+        return 1
+
+
 def print_version() -> None:
     """Print version information for the package."""
     print(f"Practices MCP Server version: {__version__}")
@@ -232,11 +601,66 @@ def practices_main() -> int:
             print(f"Unknown subcommand: {subcommand}")
             print("Available subcommands: create, validate")
             return 1
+    elif args.command == "hooks":
+        if not remaining:
+            print("Error: subcommand required")
+            print("Available subcommands: install, update")
+            return 1
+        
+        subcommand = remaining[0]
+        if subcommand == "install":
+            return install_hooks_command(remaining[1:])
+        elif subcommand == "update":
+            return update_hooks_command(remaining[1:])
+        else:
+            print(f"Unknown subcommand: {subcommand}")
+            print("Available subcommands: install, update")
+            return 1
+    elif args.command == "header":
+        if not remaining:
+            print("Error: subcommand required")
+            print("Available subcommands: add, verify, batch")
+            return 1
+        
+        subcommand = remaining[0]
+        if subcommand == "add":
+            return add_header_command(remaining[1:])
+        elif subcommand == "verify":
+            return verify_header_command(remaining[1:])
+        elif subcommand == "batch":
+            return batch_headers_command(remaining[1:])
+        else:
+            print(f"Unknown subcommand: {subcommand}")
+            print("Available subcommands: add, verify, batch")
+            return 1
     elif args.command == "version":
-        print_version()
-        return 0
+        if not remaining:
+            print_version()
+            return 0
+        
+        subcommand = remaining[0]
+        if subcommand == "validate":
+            return version_validate_command(remaining[1:])
+        elif subcommand == "get":
+            return version_get_command(remaining[1:])
+        elif subcommand == "bump":
+            return version_bump_command(remaining[1:])
+        elif subcommand == "info":
+            print_version()
+            return 0
+        else:
+            print(f"Unknown subcommand: {subcommand}")
+            print("Available subcommands: validate, get, bump, info")
+            return 1
     elif args.command == "help":
         parser.print_help()
+        print("\nAvailable commands:")
+        print("  server           - Run the MCP server")
+        print("  branch           - Branch management commands")
+        print("  hooks            - Pre-commit hooks management")
+        print("  header           - License header management")
+        print("  version          - Version management commands")
+        print("  help             - Show this help message")
         return 0
     else:
         print(f"Unknown command: {args.command}")
