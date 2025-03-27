@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Replaced mcp-python-sdk dependency with mcp[cli]>=1.3.0
 - Added uv configuration and lock file
 - Updated documentation for the new build system and dependencies
+- Refactored MCP server to use FastMCP implementation (PMS-15)
 
 ## [0.2.0] - 2025-03-27
 ### Added
