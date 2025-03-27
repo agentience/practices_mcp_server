@@ -4,6 +4,89 @@ An MCP server that provides tools and resources for development practices.
 
 ## Features
 
+### Versioning
+
+The Practices MCP server follows [Semantic Versioning 2.0.0](https://semver.org/) with a clear process for version management:
+
+- **MAJOR.MINOR.PATCH**: Version format (e.g., 0.2.0)
+  - **MAJOR**: Incremented for incompatible API changes
+  - **MINOR**: Incremented for new functionality
+  - **PATCH**: Incremented for bug fixes
+
+#### Versioning Process
+
+When working with the Practices MCP server, follow these steps to maintain proper versioning:
+
+1. **Feature Development**:
+   - Create feature branches (never include version changes)
+   - Complete feature implementation and tests
+   - Merge feature branches to develop
+
+2. **Version Updates**:
+   - After completing significant features, create a release branch:
+     ```bash
+     git checkout develop
+     git pull origin develop
+     git checkout -b release/x.y.0
+     ```
+   - Bump the version using bump2version:
+     ```bash
+     # For new features (most common)
+     bump2version minor
+     
+     # For bug fixes only
+     bump2version patch
+     
+     # For breaking changes
+     bump2version major
+     ```
+   - Update the CHANGELOG.md with new features and changes
+
+3. **Merging Release Branches**:
+   - After testing, merge the release branch to both develop and main
+   - Delete the release branch after merging
+
+#### Via MCP Tools
+
+The server provides the following versioning MCP tools:
+
+1. `validate_version`: Checks version consistency across project files
+2. `bump_version`: Bumps version according to semantic versioning rules
+
+Example:
+```python
+from mcp.tools import call_tool
+
+# Validate version consistency
+result = call_tool(
+    "practices", 
+    "validate_version",
+    {}
+)
+
+# Bump version
+result = call_tool(
+    "practices", 
+    "bump_version", 
+    {"type": "minor"}
+)
+```
+
+#### Via CLI
+
+Version management is also available through the CLI:
+
+```bash
+# Check version consistency
+practices version check
+
+# Bump version (minor)
+practices version bump minor
+
+# Bump version (patch)
+practices version bump patch
+```
+
 ### Branch Management
 
 The Practices MCP server provides tools for managing Git branches according to a standardized convention:
