@@ -12,6 +12,11 @@ from mcp_server_practices import __version__
 from mcp_server_practices.branch.validator import validate_branch_name as validate_branch
 from mcp_server_practices.branch.creator import create_branch as create_branch_func
 from mcp_server_practices.integrations.jira import update_issue_status
+from mcp_server_practices.integrations.github import (
+    get_repository_info, create_branch as github_create_branch,
+    create_pull_request as github_create_pr, get_file_contents,
+    update_file, GitHubAdapter
+)
 from mcp_server_practices.hooks.installer import install_hooks, check_git_repo_init, update_hooks
 from mcp_server_practices.headers.manager import add_license_header, verify_license_header, process_files_batch
 from mcp_server_practices.version.validator import validate_version as validate_version_func
@@ -69,6 +74,43 @@ class PracticesServer:
             "callTool",
             {"name": "validate_branch_name"},
             self.validate_branch_name
+        )
+        
+        # GitHub integration tools
+        self.server.set_request_handler(
+            "callTool",
+            {"name": "get_github_repository_info"},
+            self.get_github_repository_info
+        )
+        
+        self.server.set_request_handler(
+            "callTool",
+            {"name": "create_github_branch"},
+            self.create_github_branch
+        )
+        
+        self.server.set_request_handler(
+            "callTool",
+            {"name": "create_github_pull_request"},
+            self.create_github_pull_request
+        )
+        
+        self.server.set_request_handler(
+            "callTool",
+            {"name": "get_github_file_contents"},
+            self.get_github_file_contents
+        )
+        
+        self.server.set_request_handler(
+            "callTool",
+            {"name": "update_github_file"},
+            self.update_github_file
+        )
+        
+        self.server.set_request_handler(
+            "callTool",
+            {"name": "get_github_workflow_status"},
+            self.get_github_workflow_status
         )
         
         self.server.set_request_handler(
@@ -727,6 +769,249 @@ class PracticesServer:
                     {
                         "type": "text",
                         "text": f"Error processing license headers: {result.get('error', 'Unknown error')}"
+                    },
+                ],
+                "isError": True
+            }
+    
+    # GitHub integration methods
+    async def get_github_repository_info(self, request: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Get information about a GitHub repository.
+        """
+        args = request.get("arguments", {})
+        owner = args.get("owner", "")
+        repo = args.get("repo", "")
+        
+        # Call the GitHub adapter function
+        result = get_repository_info(owner, repo, self.config)
+        
+        if result.get("success", False):
+            # Format the response for display
+            repo_info = result.get("repository", {})
+            return {
+                "content": [
+                    {
+                        "type": "text",
+                        "text": f"Repository information for {owner}/{repo}:\n" +
+                                f"Description: {repo_info.get('description', 'No description')}\n" +
+                                f"Default branch: {repo_info.get('default_branch', 'unknown')}\n" +
+                                f"Stars: {repo_info.get('stargazers_count', 0)}\n" +
+                                f"Forks: {repo_info.get('forks_count', 0)}\n" +
+                                f"Open issues: {repo_info.get('open_issues_count', 0)}"
+                    },
+                ],
+            }
+        else:
+            return {
+                "content": [
+                    {
+                        "type": "text",
+                        "text": f"Error getting repository information: {result.get('error', 'Unknown error')}"
+                    },
+                ],
+                "isError": True
+            }
+    
+    async def create_github_branch(self, request: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Create a new branch in a GitHub repository.
+        """
+        args = request.get("arguments", {})
+        owner = args.get("owner", "")
+        repo = args.get("repo", "")
+        branch_name = args.get("branch_name", "")
+        base_branch = args.get("base_branch", "")
+        
+        # Call the GitHub adapter function
+        result = github_create_branch(owner, repo, branch_name, base_branch, self.config)
+        
+        if result.get("success", False):
+            return {
+                "content": [
+                    {
+                        "type": "text",
+                        "text": result.get("message", f"Created branch '{branch_name}' from '{base_branch}' in {owner}/{repo}")
+                    },
+                ],
+            }
+        else:
+            return {
+                "content": [
+                    {
+                        "type": "text",
+                        "text": f"Error creating branch: {result.get('error', 'Unknown error')}"
+                    },
+                ],
+                "isError": True
+            }
+    
+    async def create_github_pull_request(self, request: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Create a pull request in a GitHub repository.
+        """
+        args = request.get("arguments", {})
+        owner = args.get("owner", "")
+        repo = args.get("repo", "")
+        title = args.get("title", "")
+        body = args.get("body", "")
+        head = args.get("head", "")
+        base = args.get("base", "")
+        draft = args.get("draft", False)
+        
+        # Call the GitHub adapter function
+        result = github_create_pr(owner, repo, title, body, head, base, draft, self.config)
+        
+        if result.get("success", False):
+            return {
+                "content": [
+                    {
+                        "type": "text",
+                        "text": result.get("message", f"Created pull request in {owner}/{repo}") + 
+                                f"\nPR #{result.get('pr_number', 'unknown')}: {result.get('html_url', '')}"
+                    },
+                ],
+            }
+        else:
+            return {
+                "content": [
+                    {
+                        "type": "text",
+                        "text": f"Error creating pull request: {result.get('error', 'Unknown error')}"
+                    },
+                ],
+                "isError": True
+            }
+    
+    async def get_github_file_contents(self, request: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Get the contents of a file from a GitHub repository.
+        """
+        args = request.get("arguments", {})
+        owner = args.get("owner", "")
+        repo = args.get("repo", "")
+        path = args.get("path", "")
+        ref = args.get("ref")
+        
+        # Call the GitHub adapter function
+        result = get_file_contents(owner, repo, path, ref, self.config)
+        
+        if result.get("success", False):
+            return {
+                "content": [
+                    {
+                        "type": "text",
+                        "text": f"Contents of {path} in {owner}/{repo}:\n\n{result.get('content', '')}"
+                    },
+                ],
+            }
+        else:
+            return {
+                "content": [
+                    {
+                        "type": "text",
+                        "text": f"Error getting file contents: {result.get('error', 'Unknown error')}"
+                    },
+                ],
+                "isError": True
+            }
+    
+    async def update_github_file(self, request: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Update a file in a GitHub repository.
+        """
+        args = request.get("arguments", {})
+        owner = args.get("owner", "")
+        repo = args.get("repo", "")
+        path = args.get("path", "")
+        message = args.get("message", "Update file")
+        content = args.get("content", "")
+        branch = args.get("branch", "")
+        sha = args.get("sha", "")
+        
+        # Call the GitHub adapter function
+        result = update_file(owner, repo, path, message, content, branch, sha, self.config)
+        
+        if result.get("success", False):
+            return {
+                "content": [
+                    {
+                        "type": "text",
+                        "text": result.get("message", f"Updated file {path} on {branch} in {owner}/{repo}")
+                    },
+                ],
+            }
+        else:
+            return {
+                "content": [
+                    {
+                        "type": "text",
+                        "text": f"Error updating file: {result.get('error', 'Unknown error')}"
+                    },
+                ],
+                "isError": True
+            }
+    
+    async def get_github_workflow_status(self, request: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Get the workflow status for a branch or repository.
+        """
+        args = request.get("arguments", {})
+        owner = args.get("owner", "")
+        repo = args.get("repo", "")
+        branch = args.get("branch")
+        
+        # Create a GitHub adapter instance
+        github_adapter = GitHubAdapter(self.config)
+        
+        # Call the adapter method
+        result = github_adapter.get_workflow_status(owner, repo, branch)
+        
+        if result.get("success", False):
+            # Format the response for display
+            output = f"Workflow status for {owner}/{repo}"
+            if branch:
+                output += f", branch '{branch}'"
+            
+            # Add branch information if available
+            if "branch" in result:
+                branch_info = result["branch"]
+                output += f"\n\nBranch Information:\n" + \
+                          f"Name: {branch_info.get('name', branch)}\n" + \
+                          f"SHA: {branch_info.get('commit', {}).get('sha', 'unknown')}"
+            
+            # Add PR information if available
+            if "pull_requests" in result:
+                prs = result["pull_requests"]
+                if prs:
+                    output += f"\n\nPull Requests ({len(prs)}):"
+                    for pr in prs:
+                        output += f"\n- #{pr.get('number', 'unknown')}: {pr.get('title', 'No title')}"
+                        output += f" ({pr.get('state', 'unknown')})"
+                else:
+                    output += "\n\nNo open pull requests found."
+            
+            # Add repository information if available
+            if "repository" in result:
+                repo_info = result["repository"]
+                output += f"\n\nRepository Information:\n" + \
+                          f"Default branch: {repo_info.get('default_branch', 'unknown')}\n" + \
+                          f"Open issues: {repo_info.get('open_issues_count', 0)}"
+            
+            return {
+                "content": [
+                    {
+                        "type": "text",
+                        "text": output
+                    },
+                ],
+            }
+        else:
+            return {
+                "content": [
+                    {
+                        "type": "text",
+                        "text": f"Error getting workflow status: {result.get('error', 'Unknown error')}"
                     },
                 ],
                 "isError": True
