@@ -67,7 +67,22 @@ Our current focus is on **completing GitHub and Jira integrations** (PMS-6, PMS-
 
 ## Recent Decisions
 
-### 1. Branching Strategy Enhancements
+### 1. Version Management and Compliance (PMS-13)
+
+We have created a release branch and incremented our version number from 0.1.0 to 0.2.0 to align with our versioning strategy. This process included:
+
+- Creating a release/0.2.0 branch from develop
+- Using bump2version to increment the minor version number
+- Creating a CHANGELOG.md file following Keep a Changelog format
+- Documenting completed features in the changelog
+
+To ensure future compliance with our versioning strategy, we will follow these steps:
+- After completing a set of features, create a release branch
+- Bump the version number according to semantic versioning principles
+- Update the CHANGELOG.md with new features and changes
+- Merge the release branch to develop and main
+
+### 2. Branching Strategy Enhancements
 
 We have enhanced our branching strategy documentation with best practices for maintaining a clean repository history:
 - Regular integration with the base branch to reduce merge conflicts
@@ -78,11 +93,11 @@ We have enhanced our branching strategy documentation with best practices for ma
 
 We will continue to use the direct merge approach with `--no-ff` as documented, while following these practices to maintain a clean history.
 
-### 2. Implementation Language
+### 3. Implementation Language
 
 We have decided to implement the Practices MCP server in **Python**, the same language as Tribal. This has made it easier to extract and adapt the existing code, as seen with branch management and version management functionality.
 
-### 2. Project Structure
+### 4. Project Structure
 
 We have chosen a modular project structure that separates concerns:
 - `branch/` - Branch management functionality
@@ -92,7 +107,7 @@ We have chosen a modular project structure that separates concerns:
 - `templates/` - Resource templates
 - `utils/` - Utility functions
 
-### 3. Integration Strategy
+### 5. Integration Strategy
 
 We will leverage existing MCP servers for external integrations:
 - `github` MCP server for GitHub operations
@@ -100,7 +115,7 @@ We will leverage existing MCP servers for external integrations:
 
 This approach minimizes duplication and focuses our server on its core purpose.
 
-### 4. Configuration Approach
+### 6. Configuration Approach
 
 We have chosen a YAML-based configuration system (`.practices.yaml`) that allows for:
 - Project-specific customization
@@ -108,7 +123,7 @@ We have chosen a YAML-based configuration system (`.practices.yaml`) that allows
 - Configurable branching strategies
 - Flexible version file patterns
 
-### 5. Dependency Management
+### 7. Dependency Management
 
 We have decided to use **uv** for dependency management and virtual environments:
 - Creating virtual environments with `uv venv`
@@ -128,7 +143,7 @@ We are actively maintaining a clean repository by:
 Current active branches:
 - `main` (production)
 - `develop` (integration)
-- `feature/PMS-5-pr-preparation-tools` (current work)
+- `release/0.2.0` (current version update)
 
 ### 2. Code Migration Strategy
 
@@ -179,7 +194,13 @@ The `mcp-python-sdk` dependency may not be readily available in public registrie
 
 ## Completed Tasks
 
-1. Implemented the MCP server framework (PMS-2 - closed as duplicate of PMS-12) ✅
+1. Version compliance update (PMS-13) ✅
+   - Created release/0.2.0 branch
+   - Bumped version from 0.1.0 to 0.2.0
+   - Created CHANGELOG.md with version history
+   - Documented version management process
+
+2. Implemented the MCP server framework (PMS-2 - closed as duplicate of PMS-12) ✅
 2. Implemented branch management functionality (PMS-3) ✅
    - Branch validation with configurable patterns
    - Branch creation with standardized naming

@@ -1,0 +1,45 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+## [0.2.0] - 2025-03-27
+### Added
+- Branch management functionality (PMS-3)
+  - Branch validation with configurable patterns
+  - Branch creation with standardized naming
+  - Jira integration for issue status updates
+  - CLI commands for branch operations
+- Version management functionality (PMS-4)
+  - Version validation with consistency checking
+  - Version bumping with semantic versioning support
+  - Integration with bump2version tool
+  - CLI commands for version operations
+- Pre-commit hooks and license headers (PMS-12)
+  - Pre-commit hooks installation and management
+  - License header management with templates
+  - CLI commands for hooks and headers
+  - Tool definitions for self-documentation
+- PR preparation tools (PMS-5)
+  - PR templates for different branch types
+  - PR description generation from branch info
+  - PR workflow with readiness checks
+  - GitHub integration for PR submission
+
+### Changed
+- Enhanced project documentation with best practices for maintaining clean Git history
+- Updated branching strategy documentation
+- Improved error handling and feedback messages
+
+## [0.1.0] - 2025-03-24
+### Added
+- Initial project scaffolding (PMS-1)
+  - Basic directory structure
+  - Configuration files
+  - Development environment setup
+  - CI/CD workflows setup
+- Initial MCP server framework
