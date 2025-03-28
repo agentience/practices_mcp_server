@@ -100,7 +100,7 @@ def create_server():
     github_tools.register_tools(mcp, config)
     
     # Register system instructions resource
-    @mcp.resource_uri("practices://system-instructions")
+    @mcp.resource("practices://system-instructions")
     async def system_instructions_resource():
         instructions = await get_system_instructions()
         return TextContent(
