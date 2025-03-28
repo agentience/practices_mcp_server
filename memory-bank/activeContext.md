@@ -63,12 +63,15 @@ Our current focus is on **configuration system implementation** (PMS-8) after co
 2. ✅ Migrated from mcp-python-sdk to FastMCP implementation (PMS-15)
 3. ✅ Added uv dependency management with lock file
 4. ✅ Implemented GitHub integration (PMS-6)
+5. ✅ Fixed MCP dependency import error (PMS-16)
+6. ✅ Modernized MCP server implementation with decorator pattern (PMS-17)
+7. ✅ Expanded Jira integration with issue linking capabilities (PMS-7)
 
 We'll be working on:
 1. ⬜ Implementing configuration system (PMS-8)
 2. ⬜ Creating strategy templates (PMS-9)
-3. ⬜ Completing Jira integration improvements (PMS-7)
-4. ⬜ Implementing issue linking capabilities
+3. ⬜ Documenting Jira integration (remaining part of PMS-7)
+4. ⬜ Implementing CLI commands for PR and version features (PMS-10)
 
 ## Recent Decisions
 
@@ -138,6 +141,14 @@ We have implemented **uv** for dependency management and virtual environments:
 - Leveraging uv's managed mode for reliable dependency resolution
 - Improved performance over traditional pip/venv
 
+### 8. Jira Integration Approach
+
+We have implemented a comprehensive Jira integration with:
+- Issue status updates tied to branch creation (e.g., "In Progress" when starting work)
+- Issue linking capabilities to connect related tickets
+- Standardized error handling and response formatting
+- Mock-based testing to ensure reliability without depending on actual Jira servers
+
 ## Active Considerations
 
 ### 1. Repository Maintenance
@@ -160,7 +171,7 @@ We evaluated the branch management code from Tribal:
 - Added direct Jira integration for issue status updates
 - Enhanced error handling and result formatting
 
-### 2. Testing Strategy
+### 3. Testing Strategy
 
 Our testing strategy includes:
 - Unit tests for individual components
@@ -179,14 +190,14 @@ Key testing guidelines:
 
 We've documented these test requirements in `docs/llm_context/pr_preparation_guide.md` to ensure all team members and clients understand the importance of this practice.
 
-### 3. Deployment Strategy
+### 4. Deployment Strategy
 
 We need to decide on the deployment approach:
 - Python package distribution
 - Docker container deployment
 - MCP settings integration
 
-### 4. Documentation Strategy
+### 5. Documentation Strategy
 
 We have updated the README with:
 - Overview of branch management functionality
@@ -259,11 +270,25 @@ None. We have successfully migrated from `mcp-python-sdk` to `mcp[cli]`, which r
    - Enhanced server implementation with modern API approach
    - Fixed resource registration using templates
 
+10. Implemented MCP dependency resolution (PMS-16) ✅
+    - Fixed "No module named 'mcp.tools'" error
+    - Updated integration files to use direct imports
+    - Removed try/except fallback pattern
+    - Removed utils/mcp_tools.py file
+    - Fixed package installation via uv tool install
+
+11. Expanded Jira integration (PMS-7) ✅
+    - Implemented issue linking capabilities
+    - Added ability to create links between related tickets
+    - Added ability to retrieve and format issue links
+    - Created tests for Jira integration functionality
+    - Fixed Python test imports and mocking
+
 ## Next Steps
 
 1. Implement configuration system (PMS-8)
 2. Create strategy templates (PMS-9)
-3. Complete Jira integration improvements (PMS-7)
+3. Document Jira integration (remaining part of PMS-7)
 4. Implement CLI commands for PR and version features (PMS-10)
 
 ## Key Stakeholders
@@ -283,8 +308,8 @@ The implementation is following the phased approach outlined in the implementati
 
 1. Initial Setup and Core Structure (PMS-1, PMS-2) - Completed ✅
 2. Core Functionality Implementation (PMS-3, PMS-4, PMS-5, PMS-12) - Completed ✅
-3. Infrastructure Improvements (PMS-14, PMS-15) - Completed ✅
-4. Integration Implementation (PMS-6, PMS-7) - PMS-6 Completed ✅, PMS-7 In Progress
+3. Infrastructure Improvements (PMS-14, PMS-15, PMS-16, PMS-17) - Completed ✅
+4. Integration Implementation (PMS-6, PMS-7) - PMS-6 Completed ✅, PMS-7 Almost Complete ⚠️
 5. Configuration and Templates (PMS-8, PMS-9) - Next Focus
 6. CLI and User Experience (PMS-10, PMS-11)
 

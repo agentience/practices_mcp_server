@@ -94,6 +94,19 @@
 - ✅ Fix resource registration using templates
 - ✅ Add proper error handling for server shutdown
 
+#### MCP Dependency Resolution (PMS-16)
+- ✅ Fixed "No module named 'mcp.tools'" error
+- ✅ Updated integration files to use direct imports
+- ✅ Removed try/except fallback pattern
+- ✅ Removed utils/mcp_tools.py file
+- ✅ Fixed package installation via uv tool install
+
+#### MCP Server Modernization (PMS-17)
+- ✅ Completely replaced mcp_server.py with decorator-based implementation
+- ✅ Removed class-based approach in favor of functional style
+- ✅ Enhanced code readability and maintainability
+- ✅ Aligned with patterns used in the tribal project
+
 ### Phase 4: Integration Implementation
 
 #### GitHub Integration (PMS-6)
@@ -105,10 +118,10 @@
 
 #### Jira Integration (PMS-7)
 - ✅ Implement basic Jira MCP adapter for issue status
-- ⬜ Expand issue management capabilities
-- ⬜ Implement issue linking capabilities
+- ✅ Expand issue management capabilities
+- ✅ Implement issue linking capabilities
 - ⬜ Document Jira integration
-- ⬜ Write integration tests
+- ✅ Write integration tests
 
 ### Phase 4: Configuration and Templates
 
@@ -154,7 +167,7 @@ Most recently, we've migrated the build system to hatchling (PMS-14) and refacto
 
 1. Implement configuration system (PMS-8)
 2. Create strategy templates (PMS-9)
-3. Complete Jira integration improvements (PMS-7)
+3. Document Jira integration (remaining part of PMS-7)
 4. Implement CLI commands for PR and version features (PMS-10)
 
 ## Known Issues
@@ -175,8 +188,10 @@ None. The previous issue with the `mcp-python-sdk` dependency has been resolved 
 | PR Preparation | ✅ Complete | 100% |
 | Build System Migration | ✅ Complete | 100% |
 | FastMCP Implementation | ✅ Complete | 100% |
+| MCP Dependency Resolution | ✅ Complete | 100% |
+| MCP Server Modernization | ✅ Complete | 100% |
 | GitHub Integration | ✅ Complete | 100% |
-| Jira Integration | 🔄 In Progress | 20% |
+| Jira Integration | 🔄 In Progress | 80% |
 | Configuration System | ⬜ Not Started | 0% |
 | Strategy Templates | ⬜ Not Started | 0% |
 | Command Line Interface | 🔄 In Progress | 40% |
@@ -185,7 +200,7 @@ None. The previous issue with the `mcp-python-sdk` dependency has been resolved 
 ## Overall Progress
 
 - **Planning**: 100% complete
-- **Implementation**: ~63% complete (10/16 milestones)
-- **Testing**: Branch management, hooks, headers, and PR preparation tests complete, integration tests for GitHub completed
+- **Implementation**: ~75% complete (13/18 milestones)
+- **Testing**: Branch management, hooks, headers, PR preparation, and Jira integration tests complete, integration tests for GitHub completed
 - **Documentation**: Planning docs complete, implementation docs updated with build system changes, branching best practices added
-- **Overall Project**: Approximately 55% complete
+- **Overall Project**: Approximately 60% complete
