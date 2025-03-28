@@ -141,7 +141,8 @@ The Practices MCP Server provides the following tool categories:
 
 #### 1. PR Preparation Requirements
 
-- All tests MUST pass before a PR is considered ready
+- All relevant tests MUST be run and pass BEFORE any commit and BEFORE a PR is considered ready
+- Each requirement in the acceptance criteria must be tested and verified
 - Branch must follow naming conventions
 - All changes must be committed
 - PR description must follow template
@@ -175,14 +176,55 @@ The Practices MCP Server provides the following tool categories:
 
 ### Jira Integration Practices
 
-#### 1. Ticket Status Management
+#### 1. Jira Ticket Creation Workflow
 
-- Set ticket to "In Progress" when starting work
+- **Create Tickets Before Development**: Always create or ensure a Jira ticket exists BEFORE starting any development work
+- **Required Fields by Issue Type**:
+  - **Story**: Must include acceptance criteria that clearly define when the story is complete
+  - **Bug**: Must include steps to reproduce and expected behavior
+  - **Task**: Must include clear definition of done
+- **Creating Tickets Programmatically**:
+  ```python
+  # Example: Create a Story with acceptance criteria
+  call_tool("jira-server", "create_issue", {
+      "projectKey": "PMS",
+      "summary": "Implement feature X",
+      "issueType": "Story",
+      "description": "As a user, I want to...\n\n*Acceptance Criteria:*\n1. Feature works when...\n2. Tests are added for...\n3. Documentation is updated with...",
+      "priority": "Medium"
+  })
+  ```
+
+#### 2. Ticket Status Management
+
+- Set ticket to "In Progress" when starting work using `update_issue` tool
 - Include ticket ID in branch names and commits
 - Reference tickets in PR descriptions
-- Update ticket status when work is complete
+- Run all tests before marking any work as complete
+- Update ticket status to "Done" ONLY after all acceptance criteria are met and tests pass
+- Use `update_issue` tool to update status throughout the development lifecycle
 
-#### 2. Issue Linking
+#### 3. Ticket Completion Requirements
+
+Before marking any ticket as "Done":
+
+1. **Verify All Acceptance Criteria**: Each item in the acceptance criteria must be explicitly verified
+2. **Run All Tests**: All test suites relevant to the changes must pass:
+   ```bash
+   # Run relevant test suites
+   python -m pytest tests/unit/ tests/integration/
+   ```
+3. **Update Documentation**: Ensure documentation reflects any changes made
+4. **Update Jira Status**: Only after all above requirements are met
+   ```python
+   # Update ticket status to Done
+   call_tool("jira-server", "update_issue", {
+       "issueKey": "PMS-123",
+       "status": "Done"
+   })
+   ```
+
+#### 4. Issue Linking
 
 - Link related issues appropriately
 - Use proper link types (e.g., "blocks", "is blocked by")
@@ -227,37 +269,94 @@ When helping users with development tasks:
 ### Starting a New Feature
 
 ```
-# 1. Create a properly named feature branch
+# 1. Create or verify Jira ticket exists with acceptance criteria
+call_tool("jira-server", "create_issue", {
+    "projectKey": "PMS",
+    "summary": "Add validation feature",
+    "issueType": "Story",
+    "description": "As a user, I want to validate inputs\n\n*Acceptance Criteria:*\n1. Validates all input types\n2. Provides meaningful error messages\n3. Tests cover all validation scenarios",
+    "priority": "Medium"
+})
+
+# 2. Create a properly named feature branch
 call_tool("practices", "create_branch", {
     "branch_type": "feature",
     "ticket_id": "PMS-123",
     "description": "add-validation"
 })
 
-# 2. After completing the feature and tests
+# 3. Set Jira ticket to "In Progress"
+call_tool("jira-server", "update_issue", {
+    "issueKey": "PMS-123",
+    "status": "In Progress"
+})
+
+# 4. After implementing the feature, run all tests before committing
+# python -m pytest tests/unit/ tests/integration/
+
+# 5. Verify all acceptance criteria are met
+# - Each item in acceptance criteria must be explicitly verified
+
+# 6. Prepare PR only after all tests pass and acceptance criteria are met
 call_tool("practices", "prepare_pr", {})
 
-# 3. If ready, submit the PR
+# 7. Submit the PR if ready
 call_tool("practices", "submit_pr", {})
+
+# 8. Update Jira ticket status to "Done" only after all requirements are met
+call_tool("jira-server", "update_issue", {
+    "issueKey": "PMS-123",
+    "status": "Done"
+})
 ```
 
 ### Preparing a Release
 
 ```
-# 1. Create a release branch
+# 1. Verify all features for this release have been completed
+# - All feature tickets should be in "Done" status
+# - All tests for included features should be passing
+
+# 2. Create a Jira ticket for the release (if one doesn't exist)
+call_tool("jira-server", "create_issue", {
+    "projectKey": "PMS",
+    "summary": "Release version 0.2.0",
+    "issueType": "Task",
+    "description": "Prepare release for version 0.2.0\n\n*Acceptance Criteria:*\n1. All tests pass\n2. Version numbers updated consistently\n3. Changelog updated with all features",
+    "priority": "High"
+})
+
+# 3. Set the release ticket to "In Progress"
+call_tool("jira-server", "update_issue", {
+    "issueKey": "PMS-123",
+    "status": "In Progress"
+})
+
+# 4. Create a release branch
 call_tool("practices", "create_branch", {
     "branch_type": "release",
     "version": "0.2.0"
 })
 
-# 2. Bump the version
+# 5. Bump the version
 call_tool("practices", "bump_version", {
     "part": "minor"
 })
 
-# 3. Prepare and submit PR
+# 6. Update the CHANGELOG.md with all features and fixes included
+
+# 7. Run all tests to verify the release is ready
+# python -m pytest tests/unit/ tests/integration/
+
+# 8. Prepare and submit PR only after all tests pass
 call_tool("practices", "prepare_pr", {})
 call_tool("practices", "submit_pr", {})
+
+# 9. Update release ticket to "Done" only after PR is merged
+call_tool("jira-server", "update_issue", {
+    "issueKey": "PMS-123",
+    "status": "Done"
+})
 ```
 
 ### Adding License Headers

@@ -239,7 +239,14 @@ None. We have successfully migrated from `mcp-python-sdk` to `mcp[cli]`, which r
    - Created CHANGELOG.md with version history
    - Documented version management process
 
-2. Implemented the MCP server framework (PMS-2 - closed as duplicate of PMS-12) ✅
+2. Added system instructions for LLM context (PMS-18) ✅
+   - Created comprehensive system instructions markdown template
+   - Implemented async function to load/create system instructions
+   - Registered system instructions as MCP resource
+   - Created unit tests for system instructions functionality
+   - Added pytest-asyncio for testing async code
+
+3. Implemented the MCP server framework (PMS-2 - closed as duplicate of PMS-12) ✅
 
 3. Implemented branch management functionality (PMS-3) ✅
    - Branch validation with configurable patterns

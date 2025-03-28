@@ -109,6 +109,13 @@
 - ✅ Verified server builds, installs, and runs from command line
 - ✅ Installed MCP server into Cline and Claude desktop app
 
+#### System Instructions for LLM Context (PMS-18)
+- ✅ Created comprehensive system instructions markdown template
+- ✅ Implemented async function to load/create system instructions
+- ✅ Registered system instructions as MCP resource
+- ✅ Created unit tests for system instructions functionality
+- ✅ Added pytest-asyncio for testing async code
+
 ### Phase 4: Integration Implementation
 
 #### GitHub Integration (PMS-6)
@@ -192,6 +199,7 @@ None. The previous issue with the `mcp-python-sdk` dependency has been resolved 
 | FastMCP Implementation | ✅ Complete | 100% |
 | MCP Dependency Resolution | ✅ Complete | 100% |
 | MCP Server Modernization | ✅ Complete | 100% |
+| System Instructions for LLM Context | ✅ Complete | 100% |
 | GitHub Integration | ✅ Complete | 100% |
 | Jira Integration | 🔄 In Progress | 80% |
 | Configuration System | ⬜ Not Started | 0% |
@@ -202,7 +210,7 @@ None. The previous issue with the `mcp-python-sdk` dependency has been resolved 
 ## Overall Progress
 
 - **Planning**: 100% complete
-- **Implementation**: ~75% complete (13/18 milestones)
+- **Implementation**: ~75% complete (14/19 milestones)
 - **Testing**: Branch management, hooks, headers, PR preparation, and Jira integration tests complete, integration tests for GitHub completed
 - **Documentation**: Planning docs complete, implementation docs updated with build system changes, branching best practices added
 - **Overall Project**: Approximately 60% complete
