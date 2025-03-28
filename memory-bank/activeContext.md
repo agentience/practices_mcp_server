@@ -57,13 +57,18 @@ We have completed the following activities:
 
 ## Current Focus
 
-Our current focus is on **completing GitHub and Jira integrations** (PMS-6, PMS-7). We'll be working on:
+Our current focus is on **configuration system implementation** (PMS-8) after completing several major infrastructure improvements:
 
-1. ⬜ Implementing GitHub MCP adapter
-2. ⬜ Creating PR creation integration
-3. ⬜ Implementing branch management with GitHub
-4. ⬜ Expanding Jira issue management capabilities
-5. ⬜ Implementing issue linking capabilities
+1. ✅ Updated build system to hatchling (PMS-14)
+2. ✅ Migrated from mcp-python-sdk to FastMCP implementation (PMS-15)
+3. ✅ Added uv dependency management with lock file
+4. ✅ Implemented GitHub integration (PMS-6)
+
+We'll be working on:
+1. ⬜ Implementing configuration system (PMS-8)
+2. ⬜ Creating strategy templates (PMS-9)
+3. ⬜ Completing Jira integration improvements (PMS-7)
+4. ⬜ Implementing issue linking capabilities
 
 ## Recent Decisions
 
@@ -125,10 +130,12 @@ We have chosen a YAML-based configuration system (`.practices.yaml`) that allows
 
 ### 7. Dependency Management
 
-We have decided to use **uv** for dependency management and virtual environments:
+We have implemented **uv** for dependency management and virtual environments:
 - Creating virtual environments with `uv venv`
 - Installing dependencies with `uv pip`
-- Ensuring consistent dependency resolution
+- Using lock files with `uv pip compile`
+- Ensuring consistent dependency resolution through lock files
+- Leveraging uv's managed mode for reliable dependency resolution
 - Improved performance over traditional pip/venv
 
 ## Active Considerations
@@ -190,7 +197,7 @@ We have updated the README with:
 
 ## Current Blockers
 
-The `mcp-python-sdk` dependency may not be readily available in public registries, which could complicate installation. We're handling this by providing clear instructions and workarounds in the README.
+None. We have successfully migrated from `mcp-python-sdk` to `mcp[cli]`, which resolves our previous dependency concerns. The project now uses standard packages available in public registries.
 
 ## Completed Tasks
 
@@ -201,21 +208,22 @@ The `mcp-python-sdk` dependency may not be readily available in public registrie
    - Documented version management process
 
 2. Implemented the MCP server framework (PMS-2 - closed as duplicate of PMS-12) ✅
-2. Implemented branch management functionality (PMS-3) ✅
+
+3. Implemented branch management functionality (PMS-3) ✅
    - Branch validation with configurable patterns
    - Branch creation with standardized naming
    - Jira integration for issue status updates
    - CLI commands for branch operations
    - Unit tests for branch validator
 
-3. Implemented version management functionality (PMS-4) ✅
+4. Implemented version management functionality (PMS-4) ✅
    - Version validation with consistency checking
    - Version bumping with semantic versioning support
    - Integration with bump2version tool
    - CLI commands for version operations
    - Unit tests for version management
 
-4. Implemented pre-commit hooks and license headers (PMS-12) ✅
+5. Implemented pre-commit hooks and license headers (PMS-12) ✅
    - Pre-commit hooks installation and management
    - License header management and templates
    - CLI commands for hooks and headers
@@ -224,7 +232,7 @@ The `mcp-python-sdk` dependency may not be readily available in public registrie
    - Tool definitions for self-documentation
    - Tests for hooks and headers components
 
-5. Implemented PR preparation tools (PMS-5) ✅
+6. Implemented PR preparation tools (PMS-5) ✅
    - PR templates for different branch types
    - PR description generation from branch info
    - PR workflow with readiness checks
@@ -232,16 +240,30 @@ The `mcp-python-sdk` dependency may not be readily available in public registrie
    - Unit tests for PR functionality components
    - Four new MCP tools in the server
 
-6. Enhanced project documentation ✅
+7. Enhanced project documentation ✅
    - Added best practices for maintaining clean Git history
    - Updated branching strategy documentation
    - Demonstrated proper branch cleanup
 
+8. Migrated build system to hatchling (PMS-14) ✅
+   - Updated build system from setuptools to hatchling
+   - Updated Python requirement from 3.9+ to 3.12+
+   - Added uv configuration and lock file
+   - Updated documentation for the new build system
+   - Enhanced dependency management with uv
+
+9. Implemented FastMCP server (PMS-15) ✅
+   - Refactored MCP server to use FastMCP implementation
+   - Replaced mcp-python-sdk dependency with mcp[cli]
+   - Improved tool registration with proper schema definitions
+   - Enhanced server implementation with modern API approach
+   - Fixed resource registration using templates
+
 ## Next Steps
 
-1. Complete integrations with GitHub and Jira (PMS-6, PMS-7)
-2. Implement configuration system (PMS-8)
-3. Create strategy templates (PMS-9)
+1. Implement configuration system (PMS-8)
+2. Create strategy templates (PMS-9)
+3. Complete Jira integration improvements (PMS-7)
 4. Implement CLI commands for PR and version features (PMS-10)
 
 ## Key Stakeholders
@@ -261,8 +283,9 @@ The implementation is following the phased approach outlined in the implementati
 
 1. Initial Setup and Core Structure (PMS-1, PMS-2) - Completed ✅
 2. Core Functionality Implementation (PMS-3, PMS-4, PMS-5, PMS-12) - Completed ✅
-3. Integration Implementation (PMS-6, PMS-7)
-4. Configuration and Templates (PMS-8, PMS-9)
-5. CLI and User Experience (PMS-10, PMS-11)
+3. Infrastructure Improvements (PMS-14, PMS-15) - Completed ✅
+4. Integration Implementation (PMS-6, PMS-7) - PMS-6 Completed ✅, PMS-7 In Progress
+5. Configuration and Templates (PMS-8, PMS-9) - Next Focus
+6. CLI and User Experience (PMS-10, PMS-11)
 
 Each phase is being tracked with Jira tickets in the PMS project.
