@@ -7,8 +7,59 @@ from typing import Dict, Any, Optional, List, Union
 import json
 import re
 
-# Direct import from mcp package
-from mcp.tools import call_tool
+# Direct import from mcp client session
+import asyncio
+from mcp.client.session import ClientSession
+from mcp.types import Tool
+
+def call_tool(server_name: str, tool_name: str, arguments: dict):
+    """
+    Call an MCP tool synchronously.
+    
+    Args:
+        server_name: Name of the MCP server
+        tool_name: Name of the tool to call
+        arguments: Arguments to pass to the tool
+        
+    Returns:
+        Result of the tool execution
+    """
+    result = asyncio.run(_call_tool_async(server_name, tool_name, arguments))
+    return result
+
+async def _call_tool_async(server_name: str, tool_name: str, arguments: dict):
+    """
+    Call an MCP tool asynchronously.
+    
+    Args:
+        server_name: Name of the MCP server
+        tool_name: Name of the tool to call
+        arguments: Arguments to pass to the tool
+        
+    Returns:
+        Result of the tool execution
+    """
+    session = ClientSession()
+    await session.initialize()
+    
+    # Get the tool definition
+    tool = await session.list_tools(server_name)
+    
+    # Call the tool
+    result = await session.call_tool(server_name, tool_name, arguments)
+    
+    # Extract content
+    content = {}
+    if result and result.content:
+        for item in result.content:
+            if hasattr(item, "text") and item.text:
+                try:
+                    content = eval(item.text)
+                except:
+                    content = item.text
+    
+    await session.close()
+    return content
 
 
 class GitHubAdapter:

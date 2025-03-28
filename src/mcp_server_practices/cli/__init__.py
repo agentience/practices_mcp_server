@@ -1,4 +1,4 @@
-"""CLI functionality for the practices server."""
+"""Command-line interface for the mcp-server-practices package."""
 
 from .commands import main
 
