@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Fixed
 - Added command-line argument to control logging level, default to ERROR to suppress INFO logs (PMS-21)
+- Fixed BaseModel errors in MCP tools by using keyword-only arguments (PMS-22)
 
 ## [0.3.0] - 2025-03-28
 ### Changed

@@ -40,7 +40,7 @@ def _register_validate_branch_name():
         name="validate_branch_name",
         description="Validate a branch name against the configured branching strategy"
     )
-    async def validate_branch_name(branch_name: str) -> List[TextContent]:
+    async def validate_branch_name(*, branch_name: str) -> List[TextContent]:
         """
         Validate a branch name against the configured branching strategy.
         """
@@ -66,7 +66,7 @@ def _register_create_branch():
         name="create_branch",
         description="Create a new branch following the branching convention"
     )
-    async def create_branch(branch_type: str, identifier: str, description: Any = None, update_jira: bool = True) -> List[TextContent]:
+    async def create_branch(*, branch_type: str, identifier: str, description: Any = None, update_jira: bool = True) -> List[TextContent]:
         """
         Create a new branch following the branching convention.
         """
@@ -102,7 +102,7 @@ def _register_get_branch_info():
         name="get_branch_info",
         description="Get information about a branch based on its name"
     )
-    async def get_branch_info(branch_name: str) -> List[TextContent]:
+    async def get_branch_info(*, branch_name: str) -> List[TextContent]:
         """
         Get information about a branch based on its name.
         """
