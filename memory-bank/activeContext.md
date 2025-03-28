@@ -74,6 +74,7 @@ We'll be working on:
 2. ⬜ Creating strategy templates (PMS-9)
 3. ⬜ Documenting Jira integration (remaining part of PMS-7)
 4. ⬜ Implementing CLI commands for PR and version features (PMS-10)
+5. ⬜ Adding parameter descriptions to MCP server tool registrations (PMS-23)
 
 ## Recent Decisions
 
@@ -229,11 +230,26 @@ We have updated the README with:
 
 ## Current Blockers
 
-None. We have successfully migrated from `mcp-python-sdk` to `mcp[cli]`, which resolves our previous dependency concerns. The project now uses standard packages available in public registries, and we have confirmed the MCP server can be built, installed, and run correctly.
+None. We have resolved several issues:
+1. Successfully migrated from `mcp-python-sdk` to `mcp[cli]`, which resolves our previous dependency concerns. The project now uses standard packages available in public registries.
+2. Fixed INFO logging issue by adding a command-line argument to control logging level (PMS-21).
+3. Fixed "BaseModel.__init__() takes 1 positional argument but 2 were given" errors by using keyword-only arguments in MCP tool functions (PMS-22).
 
 ## Completed Tasks
 
-1. Version compliance update (PMS-13) ✅
+1. Logging and Error Handling (PMS-21) ✅
+   - Added command-line argument to control logging level
+   - Set default logging level to ERROR to suppress INFO logs
+   - Configured both application and MCP library loggers
+   - Implemented proper logging format
+
+2. MCP Tools Enhancement (PMS-22) ✅
+   - Fixed "BaseModel.__init__() takes 1 positional argument but 2 were given" errors
+   - Modified MCP tool functions to use keyword-only arguments
+   - Created unit tests to verify and document the keyword-only pattern
+   - Ensured compatibility with Pydantic BaseModel validation
+
+3. Version compliance update (PMS-13) ✅
    - Created release/0.2.0 branch
    - Bumped version from 0.1.0 to 0.2.0
    - Created CHANGELOG.md with version history
@@ -334,6 +350,7 @@ None. We have successfully migrated from `mcp-python-sdk` to `mcp[cli]`, which r
 2. Create strategy templates (PMS-9)
 3. Document Jira integration (remaining part of PMS-7)
 4. Implement CLI commands for PR and version features (PMS-10)
+5. Add parameter descriptions to MCP server tool registrations (PMS-23)
 
 ## Key Stakeholders
 

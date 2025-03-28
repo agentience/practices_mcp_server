@@ -79,6 +79,18 @@
 
 ### Phase 3: Infrastructure Improvements
 
+#### Logging and Error Handling (PMS-21)
+- ✅ Added command-line argument to control logging level
+- ✅ Set default logging level to ERROR to suppress INFO logs
+- ✅ Configured both application and MCP library loggers
+- ✅ Implemented proper logging format
+
+#### MCP Tools Enhancement (PMS-22)
+- ✅ Fixed "BaseModel.__init__() takes 1 positional argument but 2 were given" errors
+- ✅ Modified MCP tool functions to use keyword-only arguments
+- ✅ Created unit tests to verify and document the keyword-only pattern
+- ✅ Ensured compatibility with Pydantic BaseModel validation
+
 #### Build System Migration (PMS-14)
 - ✅ Migrate from setuptools to hatchling
 - ✅ Update Python requirement to 3.12+
@@ -185,10 +197,14 @@ Most recently, we've migrated the build system to hatchling (PMS-14) and refacto
 2. Create strategy templates (PMS-9)
 3. Document Jira integration (remaining part of PMS-7)
 4. Implement CLI commands for PR and version features (PMS-10)
+5. Add parameter descriptions to MCP server tool registrations (PMS-23)
 
 ## Known Issues
 
-None. The previous issue with the `mcp-python-sdk` dependency has been resolved by migrating to `mcp[cli]`, which is available in public registries.
+None. We have resolved the following issues:
+1. The issue with `mcp-python-sdk` dependency has been resolved by migrating to `mcp[cli]`, which is available in public registries.
+2. The INFO logging issue has been fixed by adding a command-line argument for logging level (PMS-21).
+3. The "BaseModel.__init__() takes 1 positional argument but 2 were given" errors have been fixed by using keyword-only arguments in MCP tool functions (PMS-22).
 
 ## Milestone Progress
 
@@ -208,8 +224,11 @@ None. The previous issue with the `mcp-python-sdk` dependency has been resolved 
 | MCP Server Modernization | ✅ Complete | 100% |
 | System Instructions for LLM Context | ✅ Complete | 100% |
 | Enhanced Jira Workflow Instructions | ✅ Complete | 100% |
+| Logging and Error Handling | ✅ Complete | 100% |
+| MCP Tools Enhancement | ✅ Complete | 100% |
 | GitHub Integration | ✅ Complete | 100% |
 | Jira Integration | 🔄 In Progress | 80% |
+| MCP Tool Parameter Descriptions | ⬜ Not Started | 0% |
 | Configuration System | ⬜ Not Started | 0% |
 | Strategy Templates | ⬜ Not Started | 0% |
 | Command Line Interface | 🔄 In Progress | 40% |
@@ -218,7 +237,7 @@ None. The previous issue with the `mcp-python-sdk` dependency has been resolved 
 ## Overall Progress
 
 - **Planning**: 100% complete
-- **Implementation**: ~75% complete (15/20 milestones)
-- **Testing**: Branch management, hooks, headers, PR preparation, and Jira integration tests complete, integration tests for GitHub completed
+- **Implementation**: ~77% complete (17/23 milestones)
+- **Testing**: Branch management, hooks, headers, PR preparation, Jira integration, keyword-only argument pattern tests complete, integration tests for GitHub completed
 - **Documentation**: Planning docs complete, implementation docs updated with build system changes, branching best practices added
-- **Overall Project**: Approximately 60% complete
+- **Overall Project**: Approximately 65% complete
