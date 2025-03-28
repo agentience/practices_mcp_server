@@ -246,6 +246,13 @@ None. We have successfully migrated from `mcp-python-sdk` to `mcp[cli]`, which r
    - Created unit tests for system instructions functionality
    - Added pytest-asyncio for testing async code
 
+3. Enhanced Jira workflow instructions (PMS-19) ✅
+   - Added explicit requirements for creating tickets BEFORE development
+   - Specified required fields for different issue types (e.g., acceptance criteria for Stories)
+   - Clarified requirements for marking tickets as "Done" including test verification
+   - Updated workflow examples to include complete Jira ticket lifecycle
+   - Enhanced testing requirements throughout to ensure quality
+
 3. Implemented the MCP server framework (PMS-2 - closed as duplicate of PMS-12) ✅
 
 3. Implemented branch management functionality (PMS-3) ✅
