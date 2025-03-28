@@ -42,7 +42,7 @@ def _register_generate_pr_description():
         name="generate_pr_description",
         description="Generate a PR description based on branch and configuration"
     )
-    async def generate_pr_description(branch_name: str) -> List[TextContent]:
+    async def generate_pr_description(*, branch_name: str) -> List[TextContent]:
         """
         Generate a PR description based on branch and configuration.
         """
@@ -68,7 +68,7 @@ def _register_create_pull_request():
         name="create_pull_request",
         description="Create a pull request on GitHub with generated description"
     )
-    async def create_pull_request(branch_name: str) -> List[TextContent]:
+    async def create_pull_request(*, branch_name: str) -> List[TextContent]:
         """
         Create a pull request on GitHub with generated description.
         """
@@ -97,7 +97,7 @@ def _register_prepare_pr():
         name="prepare_pr",
         description="Prepare a pull request for the current or specified branch"
     )
-    async def prepare_pr(branch_name: Optional[str] = None) -> List[TextContent]:
+    async def prepare_pr(*, branch_name: Optional[str] = None) -> List[TextContent]:
         """
         Prepare a pull request for the current or specified branch.
         """
@@ -136,7 +136,7 @@ def _register_submit_pr():
         name="submit_pr",
         description="Submit a pull request for the current or specified branch"
     )
-    async def submit_pr(branch_name: Optional[str] = None, force: bool = False) -> List[TextContent]:
+    async def submit_pr(*, branch_name: Optional[str] = None, force: bool = False) -> List[TextContent]:
         """
         Submit a pull request for the current or specified branch.
         """
