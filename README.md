@@ -163,28 +163,158 @@ The server integrates with Jira to:
 
 ## Installation
 
-1. Clone the repository
+### Installing from Source (Development)
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/Agentience/mcp_server_practices.git
+   cd mcp_server_practices
+   ```
 2. Create a virtual environment with `uv`:
    ```bash
    uv venv
-   source .venv/bin/activate
+   source .venv/bin/activate  # On Windows: .venv\Scripts\activate
    ```
 3. Install the package in development mode:
    ```bash
    uv pip install -e .
    ```
+4. Install dependencies from the lock file:
+   ```bash
+   uv pip sync uv.lock
+   ```
 
-   Note: If you encounter issues with the `mcp-python-sdk` dependency, you may need to install it separately or use a workaround specific to your environment.
+### Installing as a UV Tool
+
+The recommended way to install the practices MCP server is as a UV tool, which makes it globally available without needing to activate a virtual environment:
+
+#### From the local repository (for development)
+
+```bash
+# Navigate to the project directory
+cd mcp_server_practices
+
+# Install the current directory as a UV tool
+uv tool install .
+```
+
+#### From PyPI (for users)
+
+```bash
+# Install as a UV tool from PyPI
+uv tool install mcp_server_practices
+```
+
+Either approach will make the `practices` command available system-wide through UV's tool management system. You can verify the installation with:
+
+```bash
+# List installed UV tools
+uv tool list
+```
+
+### Installing as a Standard Package (Alternative)
+
+Alternatively, you can install it as a regular package:
+
+```bash
+# Create a virtual environment (optional but recommended)
+uv venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+
+# Install the package
+uv pip install mcp_server_practices
+```
+
+Note: This project uses the `mcp` package with the CLI extras enabled.
 
 ## Running the Server
 
 ```bash
-# Activate the virtual environment
-source .venv/bin/activate
+# Activate the virtual environment (if you created one)
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 
 # Run the MCP server
 practices server
 ```
+
+## Using with Claude
+
+To use the Practices MCP server with Claude, add the appropriate configuration to your `cline_mcp_settings.json` file:
+
+### Direct Python Module Approach (Recommended for Development)
+
+This approach runs the module directly from the source code and doesn't require package installation:
+
+```json
+{
+  "mcpServers": {
+    "practices": {
+      "command": "python",
+      "args": [
+        "-m",
+        "src.mcp_server_practices.mcp_server"
+      ],
+      "disabled": false,
+      "autoApprove": [
+        "*"
+      ],
+      "cwd": "/path/to/mcp_server_practices",
+      "env": {
+        "PYTHONPATH": "/path/to/mcp_server_practices"
+      }
+    }
+  }
+}
+```
+
+### UV Tool Installation (If Available)
+
+For systems where the `mcp-python-sdk` dependency is available:
+
+```json
+{
+  "mcpServers": {
+    "practices": {
+      "command": "uvx",
+      "args": [
+        "mcp_server_practices"
+      ],
+      "disabled": false,
+      "autoApprove": [
+        "*"
+      ]
+    }
+  }
+}
+```
+
+### Standard Package Installation
+
+For systems where the package is installed in the environment:
+
+```json
+{
+  "mcpServers": {
+    "practices": {
+      "command": "practices",
+      "args": [
+        "server"
+      ],
+      "disabled": false,
+      "autoApprove": [
+        "*"
+      ]
+    }
+  }
+}
+```
+
+This configuration file is typically located at:
+- MacOS: `~/Library/Application Support/Code/User/globalStorage/saoudrizwan.claude-dev/settings/cline_mcp_settings.json`
+- Windows: `%APPDATA%\Code\User\globalStorage\saoudrizwan.claude-dev\settings\cline_mcp_settings.json`
+- Linux: `~/.config/Code/User/globalStorage/saoudrizwan.claude-dev\settings\cline_mcp_settings.json`
+
+**Note:** The direct Python module approach is most reliable during development. Make sure to update the `cwd` and `PYTHONPATH` paths to point to your project directory.
 
 ## Development
 
@@ -192,6 +322,10 @@ practices server
 2. Install development dependencies:
    ```bash
    uv pip install -e ".[dev]"
+   ```
+3. Generate or update the lock file if dependencies change:
+   ```bash
+   uv pip compile pyproject.toml -o uv.lock
    ```
 3. Run tests:
    ```bash

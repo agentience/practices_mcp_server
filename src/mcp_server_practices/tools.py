@@ -288,5 +288,176 @@ def get_tool_definitions() -> List[Dict[str, Any]]:
                 },
                 "required": ["directory"]
             }
+        },
+        # GitHub integration tools
+        {
+            "name": "get_github_repository_info",
+            "description": "Get information about a GitHub repository",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "owner": {
+                        "type": "string",
+                        "description": "Repository owner (username or organization)"
+                    },
+                    "repo": {
+                        "type": "string",
+                        "description": "Repository name"
+                    }
+                },
+                "required": ["owner", "repo"]
+            }
+        },
+        {
+            "name": "create_github_branch",
+            "description": "Create a new branch in a GitHub repository",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "owner": {
+                        "type": "string",
+                        "description": "Repository owner (username or organization)"
+                    },
+                    "repo": {
+                        "type": "string",
+                        "description": "Repository name"
+                    },
+                    "branch_name": {
+                        "type": "string",
+                        "description": "Name of the branch to create"
+                    },
+                    "base_branch": {
+                        "type": "string",
+                        "description": "Base branch to create from"
+                    }
+                },
+                "required": ["owner", "repo", "branch_name", "base_branch"]
+            }
+        },
+        {
+            "name": "create_github_pull_request",
+            "description": "Create a pull request in a GitHub repository",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "owner": {
+                        "type": "string",
+                        "description": "Repository owner (username or organization)"
+                    },
+                    "repo": {
+                        "type": "string",
+                        "description": "Repository name"
+                    },
+                    "title": {
+                        "type": "string",
+                        "description": "PR title"
+                    },
+                    "body": {
+                        "type": "string",
+                        "description": "PR description"
+                    },
+                    "head": {
+                        "type": "string",
+                        "description": "Head branch (source)"
+                    },
+                    "base": {
+                        "type": "string",
+                        "description": "Base branch (target)"
+                    },
+                    "draft": {
+                        "type": "boolean",
+                        "description": "Whether to create as a draft PR",
+                        "default": false
+                    }
+                },
+                "required": ["owner", "repo", "title", "body", "head", "base"]
+            }
+        },
+        {
+            "name": "get_github_file_contents",
+            "description": "Get the contents of a file from a GitHub repository",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "owner": {
+                        "type": "string",
+                        "description": "Repository owner (username or organization)"
+                    },
+                    "repo": {
+                        "type": "string",
+                        "description": "Repository name"
+                    },
+                    "path": {
+                        "type": "string",
+                        "description": "Path to the file"
+                    },
+                    "ref": {
+                        "type": "string",
+                        "description": "Branch, tag, or commit SHA (optional)"
+                    }
+                },
+                "required": ["owner", "repo", "path"]
+            }
+        },
+        {
+            "name": "update_github_file",
+            "description": "Update a file in a GitHub repository",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "owner": {
+                        "type": "string",
+                        "description": "Repository owner (username or organization)"
+                    },
+                    "repo": {
+                        "type": "string",
+                        "description": "Repository name"
+                    },
+                    "path": {
+                        "type": "string",
+                        "description": "Path to the file"
+                    },
+                    "message": {
+                        "type": "string",
+                        "description": "Commit message",
+                        "default": "Update file"
+                    },
+                    "content": {
+                        "type": "string",
+                        "description": "New file content"
+                    },
+                    "branch": {
+                        "type": "string",
+                        "description": "Branch to update"
+                    },
+                    "sha": {
+                        "type": "string",
+                        "description": "SHA of the file being replaced"
+                    }
+                },
+                "required": ["owner", "repo", "path", "content", "branch", "sha"]
+            }
+        },
+        {
+            "name": "get_github_workflow_status",
+            "description": "Get the workflow status for a branch or repository",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "owner": {
+                        "type": "string",
+                        "description": "Repository owner (username or organization)"
+                    },
+                    "repo": {
+                        "type": "string",
+                        "description": "Repository name"
+                    },
+                    "branch": {
+                        "type": "string",
+                        "description": "Branch name (optional)"
+                    }
+                },
+                "required": ["owner", "repo"]
+            }
         }
     ]

@@ -1,13 +1,13 @@
 [build-system]
-requires = ["setuptools>=42", "wheel"]
+requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "mcp-server-practices"
-version = "0.2.0"
+version = "0.3.0"
 description = "MCP server for development practices"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.12"
 license = { text = "MIT" }
 authors = [{ name = "Agentience", email = "info@agentience.com" }]
 classifiers = [
@@ -15,11 +15,10 @@ classifiers = [
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.12",
 ]
 dependencies = [
-    "mcp-python-sdk",
+    "mcp[cli]>=1.3.0",
     "GitPython>=3.1.30",
     "PyYAML>=6.0",
     "bump2version>=1.0.1",
@@ -27,12 +26,13 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
-    "pytest>=7.0.0",
+    "pytest>=8.0.0",
     "pytest-cov>=4.0.0",
-    "black>=23.0.0",
-    "isort>=5.12.0",
-    "flake8>=6.0.0",
-    "mypy>=1.0.0",
+    "pytest-asyncio>=0.23.0",
+    "black>=24.2.0",
+    "mypy>=1.8.0",
+    "ruff>=0.2.0",
+    "build>=1.2.2.post1",
 ]
 
 [project.scripts]
@@ -40,19 +40,22 @@ practices = "mcp_server_practices.cli:main"
 practices-server = "mcp_server_practices.mcp_server:main"
 
 [tool.setuptools]
+package-dir = {"" = "src"}
 packages = ["mcp_server_practices"]
-package-dir = { "" = "src" }
+
+[tool.uv]
+managed = true
 
 [tool.black]
 line-length = 88
-target-version = ["py39"]
+target-version = ["py312"]
 
-[tool.isort]
-profile = "black"
-line_length = 88
+[tool.ruff]
+line-length = 88
+target-version = "py312"
 
 [tool.mypy]
-python_version = "3.9"
+python_version = "3.12"
 warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = true

@@ -57,13 +57,23 @@ We have completed the following activities:
 
 ## Current Focus
 
-Our current focus is on **completing GitHub and Jira integrations** (PMS-6, PMS-7). We'll be working on:
+Our current focus is on **configuration system implementation** (PMS-8) after completing several major infrastructure improvements:
 
-1. ⬜ Implementing GitHub MCP adapter
-2. ⬜ Creating PR creation integration
-3. ⬜ Implementing branch management with GitHub
-4. ⬜ Expanding Jira issue management capabilities
-5. ⬜ Implementing issue linking capabilities
+1. ✅ Updated build system to hatchling (PMS-14)
+2. ✅ Migrated from mcp-python-sdk to FastMCP implementation (PMS-15)
+3. ✅ Added uv dependency management with lock file
+4. ✅ Implemented GitHub integration (PMS-6)
+5. ✅ Fixed MCP dependency import error (PMS-16)
+6. ✅ Modernized MCP server implementation with decorator pattern (PMS-17)
+7. ✅ Expanded Jira integration with issue linking capabilities (PMS-7)
+8. ✅ Verified working MCP server build and installation
+9. ✅ Integrated MCP server with Cline and Claude desktop app
+
+We'll be working on:
+1. ⬜ Implementing configuration system (PMS-8)
+2. ⬜ Creating strategy templates (PMS-9)
+3. ⬜ Documenting Jira integration (remaining part of PMS-7)
+4. ⬜ Implementing CLI commands for PR and version features (PMS-10)
 
 ## Recent Decisions
 
@@ -106,6 +116,7 @@ We have chosen a modular project structure that separates concerns:
 - `integrations/` - External integrations (GitHub, Jira)
 - `templates/` - Resource templates
 - `utils/` - Utility functions
+- `tools/` - MCP tools implementations with modern decorator pattern
 
 ### 5. Integration Strategy
 
@@ -125,11 +136,38 @@ We have chosen a YAML-based configuration system (`.practices.yaml`) that allows
 
 ### 7. Dependency Management
 
-We have decided to use **uv** for dependency management and virtual environments:
+We have implemented **uv** for dependency management and virtual environments:
 - Creating virtual environments with `uv venv`
 - Installing dependencies with `uv pip`
-- Ensuring consistent dependency resolution
+- Using lock files with `uv pip compile`
+- Ensuring consistent dependency resolution through lock files
+- Leveraging uv's managed mode for reliable dependency resolution
 - Improved performance over traditional pip/venv
+
+### 8. Jira Integration Approach
+
+We have implemented a comprehensive Jira integration with:
+- Issue status updates tied to branch creation (e.g., "In Progress" when starting work)
+- Issue linking capabilities to connect related tickets
+- Standardized error handling and response formatting
+- Mock-based testing to ensure reliability without depending on actual Jira servers
+
+### 9. MCP Server Implementation
+
+We have made significant improvements to the MCP server implementation:
+- Migrated from class-based implementation to modern decorator-based pattern
+- Fixed import errors with direct imports from MCP libraries
+- Simplified and improved the code organization with function-based structure
+- Made tools registration more maintainable with clean patterns
+- Verified the server can be built, installed, and run successfully
+
+### 10. Integration with AI Assistants
+
+We have successfully integrated the MCP server with AI assistants:
+- Added server to Cline settings in VS Code
+- Added server to Claude desktop app configuration
+- Ensured the server works with existing MCP clients
+- Used modern standards for MCP tools definitions
 
 ## Active Considerations
 
@@ -153,7 +191,7 @@ We evaluated the branch management code from Tribal:
 - Added direct Jira integration for issue status updates
 - Enhanced error handling and result formatting
 
-### 2. Testing Strategy
+### 3. Testing Strategy
 
 Our testing strategy includes:
 - Unit tests for individual components
@@ -172,14 +210,15 @@ Key testing guidelines:
 
 We've documented these test requirements in `docs/llm_context/pr_preparation_guide.md` to ensure all team members and clients understand the importance of this practice.
 
-### 3. Deployment Strategy
+### 4. Deployment Strategy
 
-We need to decide on the deployment approach:
-- Python package distribution
-- Docker container deployment
-- MCP settings integration
+We have implemented a deployment approach that includes:
+- Python package distribution via PyPI
+- Development mode installation with `uv pip install -e .`
+- MCP settings integration in Cline and Claude desktop
+- Command-line access via `practices-server` command
 
-### 4. Documentation Strategy
+### 5. Documentation Strategy
 
 We have updated the README with:
 - Overview of branch management functionality
@@ -190,7 +229,7 @@ We have updated the README with:
 
 ## Current Blockers
 
-The `mcp-python-sdk` dependency may not be readily available in public registries, which could complicate installation. We're handling this by providing clear instructions and workarounds in the README.
+None. We have successfully migrated from `mcp-python-sdk` to `mcp[cli]`, which resolves our previous dependency concerns. The project now uses standard packages available in public registries, and we have confirmed the MCP server can be built, installed, and run correctly.
 
 ## Completed Tasks
 
@@ -200,22 +239,37 @@ The `mcp-python-sdk` dependency may not be readily available in public registrie
    - Created CHANGELOG.md with version history
    - Documented version management process
 
-2. Implemented the MCP server framework (PMS-2 - closed as duplicate of PMS-12) ✅
-2. Implemented branch management functionality (PMS-3) ✅
+2. Added system instructions for LLM context (PMS-18) ✅
+   - Created comprehensive system instructions markdown template
+   - Implemented async function to load/create system instructions
+   - Registered system instructions as MCP resource
+   - Created unit tests for system instructions functionality
+   - Added pytest-asyncio for testing async code
+
+3. Enhanced Jira workflow instructions (PMS-19) ✅
+   - Added explicit requirements for creating tickets BEFORE development
+   - Specified required fields for different issue types (e.g., acceptance criteria for Stories)
+   - Clarified requirements for marking tickets as "Done" including test verification
+   - Updated workflow examples to include complete Jira ticket lifecycle
+   - Enhanced testing requirements throughout to ensure quality
+
+3. Implemented the MCP server framework (PMS-2 - closed as duplicate of PMS-12) ✅
+
+3. Implemented branch management functionality (PMS-3) ✅
    - Branch validation with configurable patterns
    - Branch creation with standardized naming
    - Jira integration for issue status updates
    - CLI commands for branch operations
    - Unit tests for branch validator
 
-3. Implemented version management functionality (PMS-4) ✅
+4. Implemented version management functionality (PMS-4) ✅
    - Version validation with consistency checking
    - Version bumping with semantic versioning support
    - Integration with bump2version tool
    - CLI commands for version operations
    - Unit tests for version management
 
-4. Implemented pre-commit hooks and license headers (PMS-12) ✅
+5. Implemented pre-commit hooks and license headers (PMS-12) ✅
    - Pre-commit hooks installation and management
    - License header management and templates
    - CLI commands for hooks and headers
@@ -224,7 +278,7 @@ The `mcp-python-sdk` dependency may not be readily available in public registrie
    - Tool definitions for self-documentation
    - Tests for hooks and headers components
 
-5. Implemented PR preparation tools (PMS-5) ✅
+6. Implemented PR preparation tools (PMS-5) ✅
    - PR templates for different branch types
    - PR description generation from branch info
    - PR workflow with readiness checks
@@ -232,16 +286,53 @@ The `mcp-python-sdk` dependency may not be readily available in public registrie
    - Unit tests for PR functionality components
    - Four new MCP tools in the server
 
-6. Enhanced project documentation ✅
+7. Enhanced project documentation ✅
    - Added best practices for maintaining clean Git history
    - Updated branching strategy documentation
    - Demonstrated proper branch cleanup
 
+8. Migrated build system to hatchling (PMS-14) ✅
+   - Updated build system from setuptools to hatchling
+   - Updated Python requirement from 3.9+ to 3.12+
+   - Added uv configuration and lock file
+   - Updated documentation for the new build system
+   - Enhanced dependency management with uv
+
+9. Implemented FastMCP server (PMS-15) ✅
+   - Refactored MCP server to use FastMCP implementation
+   - Replaced mcp-python-sdk dependency with mcp[cli]
+   - Improved tool registration with proper schema definitions
+   - Enhanced server implementation with modern API approach
+   - Fixed resource registration using templates
+
+10. Implemented MCP dependency resolution (PMS-16) ✅
+    - Fixed "No module named 'mcp.tools'" error
+    - Updated integration files to use direct imports
+    - Removed try/except fallback pattern
+    - Removed utils/mcp_tools.py file
+    - Fixed package installation via uv tool install
+
+11. Expanded Jira integration (PMS-7) ✅
+    - Implemented issue linking capabilities
+    - Added ability to create links between related tickets
+    - Added ability to retrieve and format issue links
+    - Created tests for Jira integration functionality
+    - Fixed Python test imports and mocking
+
+12. Modernized MCP server (PMS-17) ✅
+    - Replaced class-based approach with decorator pattern
+    - Improved code organization with function-based structure
+    - Fixed tool registration issues
+    - Implemented modern error handling
+    - Aligned with patterns used in Tribal project
+    - Verified server builds, installs, and runs correctly
+    - Installed server in Cline and Claude desktop configurations
+
 ## Next Steps
 
-1. Complete integrations with GitHub and Jira (PMS-6, PMS-7)
-2. Implement configuration system (PMS-8)
-3. Create strategy templates (PMS-9)
+1. Implement configuration system (PMS-8)
+2. Create strategy templates (PMS-9)
+3. Document Jira integration (remaining part of PMS-7)
 4. Implement CLI commands for PR and version features (PMS-10)
 
 ## Key Stakeholders
@@ -261,8 +352,9 @@ The implementation is following the phased approach outlined in the implementati
 
 1. Initial Setup and Core Structure (PMS-1, PMS-2) - Completed ✅
 2. Core Functionality Implementation (PMS-3, PMS-4, PMS-5, PMS-12) - Completed ✅
-3. Integration Implementation (PMS-6, PMS-7)
-4. Configuration and Templates (PMS-8, PMS-9)
-5. CLI and User Experience (PMS-10, PMS-11)
+3. Infrastructure Improvements (PMS-14, PMS-15, PMS-16, PMS-17) - Completed ✅
+4. Integration Implementation (PMS-6, PMS-7) - PMS-6 Completed ✅, PMS-7 Almost Complete ⚠️
+5. Configuration and Templates (PMS-8, PMS-9) - Next Focus
+6. CLI and User Experience (PMS-10, PMS-11)
 
 Each phase is being tracked with Jira tickets in the PMS project.
