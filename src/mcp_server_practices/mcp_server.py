@@ -3,7 +3,9 @@
 MCP server implementation for development practices using modern decorator pattern.
 """
 
+import argparse
 import asyncio
+import logging
 import os
 import sys
 from pathlib import Path
@@ -112,6 +114,28 @@ def create_server():
 
 # Create a main function to make it compatible with project.scripts
 def main():
+    # Parse command line arguments
+    parser = argparse.ArgumentParser(description='Practices MCP Server')
+    parser.add_argument(
+        '--log-level', 
+        default='ERROR',
+        choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'],
+        help='Set the logging level (default: ERROR)'
+    )
+    args = parser.parse_args()
+    
+    # Configure logging
+    logging_level = getattr(logging, args.log_level)
+    logging.basicConfig(
+        level=logging_level,
+        format='[%(asctime)s] %(levelname)s %(message)s',
+        datefmt='%m/%d/%y %H:%M:%S'
+    )
+    
+    # Configure both our logger and the mcp library logger
+    logging.getLogger().setLevel(logging_level)
+    logging.getLogger('mcp').setLevel(logging_level)
+    
     # Create server and set up error handling
     mcp = create_server()
     mcp.onerror = lambda error: print(f"[MCP Error] {error}", file=sys.stderr)
