@@ -116,6 +116,13 @@
 - ✅ Created unit tests for system instructions functionality
 - ✅ Added pytest-asyncio for testing async code
 
+#### Enhanced Jira Workflow Instructions (PMS-19)
+- ✅ Added explicit requirements for creating tickets BEFORE development
+- ✅ Specified required fields for different issue types (e.g., acceptance criteria for Stories)
+- ✅ Clarified requirements for marking tickets as "Done" including test verification
+- ✅ Updated workflow examples to include complete Jira ticket lifecycle
+- ✅ Enhanced testing requirements throughout to ensure quality
+
 ### Phase 4: Integration Implementation
 
 #### GitHub Integration (PMS-6)
@@ -200,6 +207,7 @@ None. The previous issue with the `mcp-python-sdk` dependency has been resolved 
 | MCP Dependency Resolution | ✅ Complete | 100% |
 | MCP Server Modernization | ✅ Complete | 100% |
 | System Instructions for LLM Context | ✅ Complete | 100% |
+| Enhanced Jira Workflow Instructions | ✅ Complete | 100% |
 | GitHub Integration | ✅ Complete | 100% |
 | Jira Integration | 🔄 In Progress | 80% |
 | Configuration System | ⬜ Not Started | 0% |
@@ -210,7 +218,7 @@ None. The previous issue with the `mcp-python-sdk` dependency has been resolved 
 ## Overall Progress
 
 - **Planning**: 100% complete
-- **Implementation**: ~75% complete (14/19 milestones)
+- **Implementation**: ~75% complete (15/20 milestones)
 - **Testing**: Branch management, hooks, headers, PR preparation, and Jira integration tests complete, integration tests for GitHub completed
 - **Documentation**: Planning docs complete, implementation docs updated with build system changes, branching best practices added
 - **Overall Project**: Approximately 60% complete

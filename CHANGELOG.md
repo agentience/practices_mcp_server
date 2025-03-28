@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [0.3.0] - 2025-03-28
 ### Changed
 - Migrated build system from setuptools to hatchling (PMS-14)
 - Updated Python requirement from 3.9+ to 3.12+
@@ -13,6 +15,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added uv configuration and lock file
 - Updated documentation for the new build system and dependencies
 - Refactored MCP server to use FastMCP implementation (PMS-15)
+
+### Added
+- Fixed MCP dependency resolution (PMS-16)
+- Implemented modernized MCP server with decorator pattern (PMS-17)
+- Added system instructions for LLM context (PMS-18)
+- Enhanced Jira integration with issue linking capabilities (PMS-7)
+- Expanded Jira workflow instructions (PMS-19)
 
 ## [0.2.0] - 2025-03-27
 ### Added
