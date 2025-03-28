@@ -5,6 +5,7 @@ Jira integration for the Practices MCP Server.
 
 from typing import Dict, Any, Optional, List
 
+# Direct import from mcp package
 from mcp.tools import call_tool
 
 

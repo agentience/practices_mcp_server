@@ -195,6 +195,7 @@ def create_pull_request(branch_name: str, config: Optional[Dict[str, Any]] = Non
     
     # Import GitHub integration if available
     try:
+        # Import directly
         from mcp.tools import call_tool
         
         # Get repository information from config
