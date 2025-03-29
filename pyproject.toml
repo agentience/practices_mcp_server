@@ -37,10 +37,18 @@ dev = [
 
 [project.scripts]
 practices = "mcp_server_practices.cli:main"
+mcp-server-practices = "mcp_server_practices:mcp_server_practices_main"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
 packages = ["mcp_server_practices"]
+include-package-data = true
+
+[tool.setuptools.package-data]
+mcp_server_practices = ["bin/*"]
+
+[tool.setuptools.exclude-package-data]
+"*" = ["*.pyc", "*.pyo", "*.pyd", "__pycache__"]
 
 [tool.uv]
 managed = true
