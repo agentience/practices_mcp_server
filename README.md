@@ -24,15 +24,51 @@ For development installation:
 pip install -e .
 ```
 
+### Using UV Tool
+
+If you want to install the package globally using UV, follow these steps to avoid file corruption:
+
+#### Option 1: Using the install_full script
+
+```bash
+# Clean, build, and install in one step
+hatch run install_full
+```
+
+This script will:
+1. Clean previous build artifacts
+2. Build the package
+3. Install the latest wheel using UV tool
+
+#### Option 2: Manual process
+
+1. First, build the package wheel:
+   ```bash
+   python -m build
+   ```
+
+2. Install the wheel directly (instead of the source directory):
+   ```bash
+   uv tool install dist/mcp_server_practices-0.3.0-py3-none-any.whl
+   ```
+
+> **Important**: Do not use `uv tool install .` directly on the source directory as it may result in corrupted files. Always build a wheel first.
+
 ## Usage
 
 ### As an MCP Server
 
-Run the server directly:
+The server can be invoked through the following method:
 
 ```bash
-uvx mcp-server-practices [options]
+# Run server using the --from parameter
+uvx --from mcp-server-practices practices [options]
+
+# Show version
+uvx --from mcp-server-practices practices --version
 ```
+
+> **Note:** Support for direct invocation via `uvx mcp-server-practices` is planned for a future release.
 
 #### Server Options
 
@@ -45,36 +81,38 @@ uvx mcp-server-practices [options]
 ### As a CLI Tool
 
 ```bash
-uvx mcp-server-practices cli [command] [options]
+# Access CLI functionality
+uvx --from mcp-server-practices practices cli [command] [options]
 ```
+
+> **Note:** Support for direct invocation via `uvx mcp-server-practices cli` is planned for a future release.
 
 #### Branch Commands
 
 ```bash
 # Validate a branch name
-uvx mcp-server-practices cli branch validate feature/ABC-123-description
+uvx --from mcp-server-practices practices cli branch validate feature/ABC-123-description
 
 # Create a branch
-uvx mcp-server-practices cli branch create feature/ABC-123-description
+uvx --from mcp-server-practices practices cli branch create feature/ABC-123-description
 ```
 
 #### Jira Commands
 
 ```bash
 # Get issue details
-uvx mcp-server-practices cli jira issue ABC-123
+uvx --from mcp-server-practices practices cli jira issue ABC-123
 
 # Update issue status
-uvx mcp-server-practices cli jira update ABC-123 "In Progress"
+uvx --from mcp-server-practices practices cli jira update ABC-123 "In Progress"
 ```
 
 ## MCP Configuration
 
 ```json
 "practices": {
-  "command": "uvx",
+  "command": "practices",
   "args": [
-    "mcp-server-practices",
     "--log-level",
     "ERROR"
   ],
@@ -98,7 +136,7 @@ python -m pytest
 ### License Headers
 
 ```bash
-uvx mcp-server-practices cli headers add /path/to/your/source/directory
+uvx --from mcp-server-practices practices cli headers add /path/to/your/source/directory
 ```
 
 ## License
