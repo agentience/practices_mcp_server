@@ -66,7 +66,7 @@ def _register_create_branch():
         name="create_branch",
         description="Create a new branch following the branching convention"
     )
-    async def create_branch(*, branch_type: str, identifier: str, description: Any = None, update_jira: bool = True) -> List[TextContent]:
+    async def create_branch(*, branch_type: str, ticket_id: str, description: Any = None, update_jira: bool = True) -> List[TextContent]:
         """
         Create a new branch following the branching convention.
         """
@@ -75,11 +75,11 @@ def _register_create_branch():
             description = description.split()
         
         # Create the branch
-        result = create_branch_func(branch_type, identifier, description, config)
+        result = create_branch_func(branch_type, ticket_id, description, config)
         
         # If branch creation was successful and it's a feature/bugfix branch, update Jira
         if result["success"] and update_jira and branch_type in ["feature", "bugfix"]:
-            jira_result = update_issue_status(identifier, "In Progress", config)
+            jira_result = update_issue_status(ticket_id, "In Progress", config)
             result["jira_update"] = jira_result
         
         # Format the response
