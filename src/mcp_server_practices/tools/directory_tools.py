@@ -20,13 +20,13 @@ import logging
 from pathlib import Path
 from typing import Dict, Any
 
-from mcp_server_practices.mcp_server import find_project_root, setup_file_logging, get_system_instructions
+from mcp_server_practices.utils.directory_utils import find_project_root, setup_file_logging, get_system_instructions
 from mcp_server_practices.utils.global_context import set_project_root, set_current_directory
 
 def register_tools(mcp, config):
     """Register directory tools with the MCP server."""
     
-    @mcp.tool
+    @mcp.tool()
     async def set_working_directory(directory_path: str) -> Dict[str, Any]:
         """
         Set the current working directory for practices tools.
