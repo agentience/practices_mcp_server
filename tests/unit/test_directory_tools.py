@@ -32,10 +32,15 @@ class MockMCP:
     def __init__(self):
         self.registered_tools = {}
         
-    def tool(self, func):
+    def tool(self, func=None):
         """Register a tool."""
-        self.registered_tools[func.__name__] = func
-        return func
+        def decorator(func):
+            self.registered_tools[func.__name__] = func
+            return func
+            
+        if func is None:
+            return decorator
+        return decorator(func)
 
 
 @pytest.fixture

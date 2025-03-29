@@ -23,7 +23,7 @@ import logging
 import pytest
 from pathlib import Path
 
-from mcp_server_practices.mcp_server import setup_file_logging, find_project_root
+from mcp_server_practices.utils.directory_utils import setup_file_logging, find_project_root
 
 
 @pytest.fixture
