@@ -88,6 +88,7 @@ def create_server():
         # If working directory hasn't been set yet, return initialization instructions
         if project_root is None:
             return TextContent(
+                type="text",
                 text="""
 # Practices MCP Server - INITIALIZATION REQUIRED
 
@@ -121,7 +122,8 @@ The working directory should be available in your environment details or can be 
         # Otherwise return the project-specific instructions
         instructions = await get_system_instructions(project_root)
         return TextContent(
-            text=instructions
+            type="text",
+            text="Load instructions from .practices/system_instructions.md"
         )
 
     return mcp
