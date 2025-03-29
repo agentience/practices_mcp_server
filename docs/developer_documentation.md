@@ -136,6 +136,18 @@ mcp_server_practices/
    uv pip sync uv.lock
    ```
 
+5. For global installation using UV:
+   ```bash
+   # Build the package wheel first
+   python -m build
+   
+   # Install the wheel directly
+   uv tool install dist/mcp_server_practices-0.3.0-py3-none-any.whl
+   ```
+   
+   > **Important**: When using UV tool for installation, always build a wheel first and install the wheel file.
+   > Using `uv tool install .` directly on the source directory can result in corrupted files in the installed package.
+
 ### Development Workflow
 
 1. Create a feature branch:

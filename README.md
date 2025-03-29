@@ -24,6 +24,36 @@ For development installation:
 pip install -e .
 ```
 
+### Using UV Tool
+
+If you want to install the package globally using UV, follow these steps to avoid file corruption:
+
+#### Option 1: Using the install_full script
+
+```bash
+# Clean, build, and install in one step
+hatch run install_full
+```
+
+This script will:
+1. Clean previous build artifacts
+2. Build the package
+3. Install the latest wheel using UV tool
+
+#### Option 2: Manual process
+
+1. First, build the package wheel:
+   ```bash
+   python -m build
+   ```
+
+2. Install the wheel directly (instead of the source directory):
+   ```bash
+   uv tool install dist/mcp_server_practices-0.3.0-py3-none-any.whl
+   ```
+
+> **Important**: Do not use `uv tool install .` directly on the source directory as it may result in corrupted files. Always build a wheel first.
+
 ## Usage
 
 ### As an MCP Server
