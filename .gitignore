@@ -56,3 +56,5 @@ dmypy.json
 
 # Project specific
 .practices.yaml
+.practices/server.log
+.practices/**/*.log
