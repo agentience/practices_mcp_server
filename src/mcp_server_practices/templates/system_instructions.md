@@ -106,7 +106,9 @@ The Practices MCP Server provides the following tool categories:
 
 #### 3. Branch Lifecycle Management
 
-- Delete branches after they are merged to base branch
+- Delete completed feature branches IMMEDIATELY after they are merged to the base branch
+- When working in solo development mode, use `git branch -d <branch-name>` to delete the branch locally after merging
+- When working in team mode, both local and remote branches should be deleted after merge
 - Regularly pull changes from base branch to avoid drift
 - Keep feature branches focused and short-lived
 
