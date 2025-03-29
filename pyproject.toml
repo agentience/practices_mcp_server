@@ -37,7 +37,6 @@ dev = [
 
 [project.scripts]
 practices = "mcp_server_practices.cli:main"
-practices-server = "mcp_server_practices.mcp_server:main"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
