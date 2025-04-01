@@ -55,6 +55,14 @@ The server adapts to your project's specific needs through a `.practices.yaml` c
 
 ## 🏁 Getting Started
 
+### Installing via Smithery
+
+To install Practices MCP Server for Claude Desktop automatically via [Smithery](https://smithery.ai/server/@agentience/practices_mcp_server):
+
+```bash
+npx -y @smithery/cli install @agentience/practices_mcp_server --client claude
+```
+
 ### 1. Installation
 
 ```bash
