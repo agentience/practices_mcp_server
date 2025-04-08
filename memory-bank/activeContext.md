@@ -76,7 +76,6 @@ We'll be working on:
 2. ⬜ Creating strategy templates (PMS-9)
 3. ⬜ Documenting Jira integration (remaining part of PMS-7)
 4. ⬜ Implementing CLI commands for PR and version features (PMS-10)
-5. ⬜ Adding parameter descriptions to MCP server tool registrations (PMS-23)
 
 ## Recent Decisions
 
@@ -378,7 +377,8 @@ None. We have resolved several issues:
 2. Create strategy templates (PMS-9)
 3. Document Jira integration (remaining part of PMS-7)
 4. Implement CLI commands for PR and version features (PMS-10)
-5. Add parameter descriptions to MCP server tool registrations (PMS-23)
+
+✅ Added parameter descriptions to MCP server tool registrations (PMS-23) - Completed
 
 ## Key Stakeholders
 

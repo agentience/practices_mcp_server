@@ -224,7 +224,6 @@ Most recently we've migrated the build system to hatchling (PMS-14) and refactor
 2. Create strategy templates (PMS-9)
 3. Document Jira integration (remaining part of PMS-7)
 4. Implement CLI commands for PR and version features (PMS-10)
-5. Add parameter descriptions to MCP server tool registrations (PMS-23)
 
 ## Known Issues
 
@@ -257,7 +256,7 @@ None. We have resolved the following issues:
 | Jira Integration | 🔄 In Progress | 80% |
 | Branch Tool Parameter Fix | ✅ Complete | 100% |
 | CLI and Server Unification | ✅ Complete | 100% |
-| MCP Tool Parameter Descriptions | ⬜ Not Started | 0% |
+| MCP Tool Parameter Descriptions | ✅ Complete | 100% |
 | Configuration System | ⬜ Not Started | 0% |
 | Strategy Templates | ⬜ Not Started | 0% |
 | Command Line Interface | 🔄 In Progress | 60% |
