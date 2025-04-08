@@ -22,6 +22,7 @@ dependencies = [
     "GitPython>=3.1.30",
     "PyYAML>=6.0",
     "bump2version>=1.0.1",
+    "pydantic>=2.0.0",
 ]
 
 [project.optional-dependencies]

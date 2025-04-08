@@ -37,7 +37,8 @@ from mcp_server_practices.tools import (
     git_tools, 
     license_tools, 
     github_tools,
-    directory_tools
+    directory_tools,
+    config_tools
 )
 
 # Import utility functions from directory_utils
@@ -76,7 +77,8 @@ def create_server():
     git_tools.register_tools(mcp, config)
     license_tools.register_tools(mcp, config)
     github_tools.register_tools(mcp, config)
-    directory_tools.register_tools(mcp, config)  # Register new directory tools
+    directory_tools.register_tools(mcp, config)  # Register directory tools
+    config_tools.register_tools(mcp, config)     # Register configuration tools
     
     # Register system instructions resource
     @mcp.resource(uri="practices://instructions/system", name="Practices System Instructions")
