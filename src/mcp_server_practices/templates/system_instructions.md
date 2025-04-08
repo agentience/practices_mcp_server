@@ -182,9 +182,18 @@ The Practices MCP Server provides the following tool categories:
 
 - **Create Tickets Before Development**: Always create or ensure a Jira ticket exists BEFORE starting any development work
 - **Required Fields by Issue Type**:
-  - **Story**: Must include acceptance criteria that clearly define when the story is complete
+  - **Story**: Must include:
+    - Acceptance criteria that clearly define when the story is complete
+    - Reference to parent Epic (if applicable)
+    - User-focused description in the format "As a [user], I want [capability] so that [benefit]"
   - **Bug**: Must include steps to reproduce and expected behavior
   - **Task**: Must include clear definition of done
+  - **Epic**: Must include:
+    - A clear business objective or goal the epic addresses
+    - High-level scope definition with boundaries
+    - Success metrics or KPIs to measure completion
+    - Dependencies on other epics or systems (if any)
+    - Estimated timeline (sprints/iterations)
 - **Creating Tickets Programmatically**:
   ```python
   # Example: Create a Story with acceptance criteria
@@ -231,6 +240,30 @@ Before marking any ticket as "Done":
 - Link related issues appropriately
 - Use proper link types (e.g., "blocks", "is blocked by")
 - Include linked issues in PR descriptions
+
+#### 5. Issue Hierarchy and Relationships
+
+- **Epic-Story Relationship**:
+  - Stories should be linked to their parent Epic using the "Epic Link" field
+  - When creating a Story, always verify if it belongs to an Epic
+  - Stories without an Epic should be exceptions, not the norm
+  - When describing a Story's context, reference its parent Epic
+  - Story acceptance criteria should align with Epic success metrics
+
+- **Creating Child Stories from Epics**:
+  ```python
+  # Example: Create a Story linked to Epic PMS-8
+  call_tool("jira-server", "create_issue", {
+      "projectKey": "PMS",
+      "summary": "Implement configuration validation",
+      "issueType": "Story",
+      "description": "As a developer, I want to validate my configuration file so that I can catch errors before runtime.\n\n*Part of Epic: PMS-8 (Configuration System)*\n\n*Acceptance Criteria:*\n1. Validates against JSON schema\n2. Provides clear error messages\n3. Tests cover validation edge cases",
+      "priority": "Medium",
+      "customFields": {
+          "epic-link": "PMS-8"  # Link to parent Epic
+      }
+  })
+  ```
 
 ## How to Use the Tools Effectively
 
@@ -375,6 +408,35 @@ call_tool("practices", "process_license_headers_batch", {
     "directory": "src",
     "pattern": "*.py",
     "recursive": true
+})
+```
+
+### Breaking Down an Epic into Stories
+
+```
+# 1. Start with a well-defined Epic (e.g., PMS-8)
+epic = call_tool("jira-server", "get_issues", {
+    "projectKey": "PMS",
+    "jql": "key = PMS-8"
+})
+
+# 2. Create child Stories that align with Epic objectives
+story1 = call_tool("jira-server", "create_issue", {
+    "projectKey": "PMS",
+    "summary": "Design configuration schema",
+    "issueType": "Story",
+    "description": "As a developer, I want a well-defined configuration schema so that I understand all available options.\n\n*Part of Epic: PMS-8 (Configuration System)*\n\n*Acceptance Criteria:*\n1. Schema covers all required configuration options\n2. Documentation explains each option\n3. Example configuration provided",
+    "priority": "Medium",
+    "customFields": {
+        "epic-link": "PMS-8"
+    }
+})
+
+# 3. Link the Story to the Epic if not done via customFields
+call_tool("jira-server", "create_issue_link", {
+    "inwardIssueKey": story1.key,
+    "outwardIssueKey": "PMS-8",
+    "linkType": "is part of"
 })
 ```
 
