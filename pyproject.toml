@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mcp-server-practices"
-version = "0.3.0"
+version = "0.4.0"
 description = "MCP server for development practices"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -37,11 +37,18 @@ dev = [
 
 [project.scripts]
 practices = "mcp_server_practices.cli:main"
-practices-server = "mcp_server_practices.mcp_server:main"
+mcp-server-practices = "mcp_server_practices:mcp_server_practices_main"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
 packages = ["mcp_server_practices"]
+include-package-data = true
+
+[tool.setuptools.package-data]
+mcp_server_practices = ["bin/*"]
+
+[tool.setuptools.exclude-package-data]
+"*" = ["*.pyc", "*.pyo", "*.pyd", "__pycache__"]
 
 [tool.uv]
 managed = true
@@ -65,3 +72,18 @@ disallow_incomplete_defs = true
 testpaths = ["tests"]
 python_files = "test_*.py"
 python_functions = "test_*"
+
+[tool.hatch.env]
+scripts = { install_full = """
+#!/bin/sh
+set -e
+echo "Cleaning previous build artifacts..."
+rm -rf dist/ build/ *.egg-info
+echo "Building package..."
+python -m build
+WHEEL_FILE=$(ls dist/*.whl | tail -n 1)
+echo "Installing package from wheel: $WHEEL_FILE"
+uv tool uninstall mcp-server-practices 2>/dev/null || true
+uv tool install "$WHEEL_FILE" -v
+echo "Installation complete!"
+""" }
