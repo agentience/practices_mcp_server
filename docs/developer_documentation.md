@@ -327,6 +327,57 @@ def test_github_adapter(mocker):
 
 ## MCP Integration
 
+### Jira Tool Examples
+
+The Jira MCP server provides several tools for interacting with Jira issues. Here are common usage examples:
+
+1. **Create a new issue**
+```xml
+<use_mcp_tool>
+<server_name>jira-server</server_name>
+<tool_name>create_issue</tool_name>
+<arguments>
+{
+  "projectKey": "PMS",
+  "summary": "Implement documentation examples",
+  "issueType": "Task",
+  "description": "Add Jira tool examples to developer documentation",
+  "labels": ["documentation", "PMS-7"],
+  "priority": "High"
+}
+</arguments>
+</use_mcp_tool>
+```
+
+2. **Get issues for a project**
+```xml
+<use_mcp_tool>
+<server_name>jira-server</server_name>
+<tool_name>get_issues</tool_name>
+<arguments>
+{
+  "projectKey": "PMS",
+  "jql": "status != Done ORDER BY created DESC"
+}
+</arguments>
+</use_mcp_tool>
+```
+
+3. **Update an existing issue**
+```xml
+<use_mcp_tool>
+<server_name>jira-server</server_name>
+<tool_name>update_issue</tool_name>
+<arguments>
+{
+  "issueKey": "PMS-7",
+  "status": "In Progress",
+  "assignee": "developer@example.com"
+}
+</arguments>
+</use_mcp_tool>
+```
+
 ### MCP Tool Registration
 
 The server registers tools with the MCP system:
@@ -355,6 +406,25 @@ def validate_branch_name(*, branch_name: str):  # Note the * before parameters
 def validate_branch_name(branch_name: str):  # Missing *
     # Implementation
     return result
+```
+
+### Server Configuration
+
+To use the Jira MCP server, add this configuration to your MCP settings:
+
+```json
+{
+  "mcpServers": {
+    "jira": {
+      "command": "jira-server",
+      "args": [],
+      "env": {
+        "JIRA_API_TOKEN": "your_api_token",
+        "JIRA_URL": "https://your-company.atlassian.net"
+      }
+    }
+  }
+}
 ```
 
 ### Using the Server with Claude

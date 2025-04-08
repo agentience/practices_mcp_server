@@ -154,7 +154,7 @@ Practices MCP Server - Progress
 - ✅ Implement basic Jira MCP adapter for issue status
 - ✅ Expand issue management capabilities
 - ✅ Implement issue linking capabilities
-- ⬜ Document Jira integration
+- ✅ Document Jira integration
 - ✅ Write integration tests
 
 ### Phase 4: Configuration and Templates
@@ -222,8 +222,8 @@ Most recently we've migrated the build system to hatchling (PMS-14) and refactor
 
 1. Implement configuration system (PMS-8)
 2. Create strategy templates (PMS-9)
-3. Document Jira integration (remaining part of PMS-7)
-4. Implement CLI commands for PR and version features (PMS-10)
+3. Implement CLI commands for PR and version features (PMS-10)
+4. Create example configurations (PMS-11)
 
 ## Known Issues
 
@@ -253,7 +253,7 @@ None. We have resolved the following issues:
 | Logging and Error Handling | ✅ Complete | 100% |
 | MCP Tools Enhancement | ✅ Complete | 100% |
 | GitHub Integration | ✅ Complete | 100% |
-| Jira Integration | 🔄 In Progress | 80% |
+| Jira Integration | ✅ Complete | 100% |
 | Branch Tool Parameter Fix | ✅ Complete | 100% |
 | CLI and Server Unification | ✅ Complete | 100% |
 | MCP Tool Parameter Descriptions | ✅ Complete | 100% |

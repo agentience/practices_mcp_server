@@ -74,8 +74,7 @@ Our current focus is on **configuration system implementation** (PMS-8) after co
 We'll be working on:
 1. ⬜ Implementing configuration system (PMS-8)
 2. ⬜ Creating strategy templates (PMS-9)
-3. ⬜ Documenting Jira integration (remaining part of PMS-7)
-4. ⬜ Implementing CLI commands for PR and version features (PMS-10)
+3. ⬜ Implementing CLI commands for PR and version features (PMS-10)
 
 ## Recent Decisions
 
@@ -375,8 +374,7 @@ None. We have resolved several issues:
 
 1. Implement configuration system (PMS-8)
 2. Create strategy templates (PMS-9)
-3. Document Jira integration (remaining part of PMS-7)
-4. Implement CLI commands for PR and version features (PMS-10)
+3. Implement CLI commands for PR and version features (PMS-10)
 
 ✅ Added parameter descriptions to MCP server tool registrations (PMS-23) - Completed
 
