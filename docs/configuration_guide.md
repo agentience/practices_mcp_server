@@ -1,411 +1,474 @@
-# Practices MCP Server - Configuration Guide
+# Configuration Guide
 
-This guide explains how to configure the Practices MCP Server for your specific project needs.
+This guide provides comprehensive documentation for the configuration system in the Practices MCP Server.
 
 ## Table of Contents
 
-- [Configuration File](#configuration-file)
-- [Project Types](#project-types)
-- [Branching Strategies](#branching-strategies)
-- [Version Management](#version-management)
-- [Jira Integration](#jira-integration)
-- [GitHub Integration](#github-integration)
-- [Pre-commit Hooks](#pre-commit-hooks)
-- [License Headers](#license-headers)
-- [Configuration Examples](#configuration-examples)
+- [Overview](#overview)
+- [Configuration File Format](#configuration-file-format)
+- [Configuration Schema](#configuration-schema)
+- [Project Type Detection](#project-type-detection)
+- [Default Configurations](#default-configurations)
+- [MCP Tools](#mcp-tools)
+- [Working with Configuration Files](#working-with-configuration-files)
+- [Common Scenarios](#common-scenarios)
+- [Troubleshooting](#troubleshooting)
 
-## Configuration File
+## Overview
 
-The Practices MCP Server is configured through a `.practices.yaml` file in your project root. This file defines your project's development practices and integrations.
+The configuration system enables development teams to customize the behavior of the Practices MCP Server based on project requirements. It provides sensible defaults while allowing flexibility for different project types, branching strategies, and development workflows.
 
-### Basic Structure
+Key features of the configuration system:
+
+- **Project type detection**: Automatically identifies project types (Python, JavaScript, etc.)
+- **Branching strategy support**: Compatible with GitFlow, GitHub Flow, and Trunk-based development
+- **Extensible schema**: Rich configuration options for integrations, PR templates, etc.
+- **Validation**: Ensures configuration is valid and consistent
+- **Simple YAML format**: Easy to read and edit
+- **MCP tools**: Provides tools for configuration management
+
+## Configuration File Format
+
+Configuration is stored in a YAML file named `.practices.yaml` in the project root directory. Here's an example of a minimal configuration file:
 
 ```yaml
-# .practices.yaml
+# Project type (python, javascript, typescript, java, csharp, go, rust, generic)
 project_type: python
+
+# Branching strategy (gitflow, github-flow, trunk)
 branching_strategy: gitflow
-workflow_mode: solo  # "solo" or "team"
+
+# Development workflow mode (solo, team)
+workflow_mode: solo 
+
+# Main branch name
 main_branch: main
+
+# Develop branch name (required for GitFlow)
 develop_branch: develop
-jira_project: PMS
-```
 
-### Creating the Configuration
-
-You can create a default configuration with:
-
-```bash
-practices init
-```
-
-This will create a `.practices.yaml` file with sensible defaults based on your project type.
-
-## Project Types
-
-The `project_type` setting determines language-specific behaviors:
-
-```yaml
-project_type: python  # Options: python, javascript, java, go, etc.
-```
-
-Each project type has defaults for:
-- Version file locations and patterns
-- File types for license headers
-- Pre-commit hook configurations
-- PR description templates
-
-## Branching Strategies
-
-The `branching_strategy` setting defines branch naming and workflow:
-
-```yaml
-branching_strategy: gitflow  # Options: gitflow, github-flow, trunk
-```
-
-### GitFlow Strategy
-
-```yaml
-branching_strategy: gitflow
-main_branch: main
-develop_branch: develop
+# Branch configurations
 branches:
   feature:
-    pattern: "feature/([A-Z]+-\d+)-(.+)"
+    pattern: ^feature/([A-Z]+-\d+)-(.+)$
     base: develop
-    version_bump: null
   bugfix:
-    pattern: "bugfix/([A-Z]+-\d+)-(.+)"
+    pattern: ^bugfix/([A-Z]+-\d+)-(.+)$
     base: develop
-    version_bump: null
   hotfix:
-    pattern: "hotfix/(\d+\.\d+\.\d+)-(.+)"
+    pattern: ^hotfix/(\d+\.\d+\.\d+(?:-[a-zA-Z0-9.]+)?)-(.+)$
     base: main
+    target: [main, develop]
     version_bump: patch
   release:
-    pattern: "release/(\d+\.\d+\.\d+)"
+    pattern: ^release/(\d+\.\d+\.\d+(?:-[a-zA-Z0-9.]+)?)(?:-(.+))?$
     base: develop
+    target: [main, develop]
     version_bump: minor
   docs:
-    pattern: "docs/(.+)"
-    base: develop
-    version_bump: null
-```
-
-### GitHub Flow Strategy
-
-```yaml
-branching_strategy: github-flow
-main_branch: main
-branches:
-  feature:
-    pattern: "feature/([A-Z]+-\d+)-(.+)"
-    base: main
-    version_bump: null
-  bugfix:
-    pattern: "bugfix/([A-Z]+-\d+)-(.+)"
-    base: main
-    version_bump: null
-  hotfix:
-    pattern: "hotfix/(\d+\.\d+\.\d+)-(.+)"
-    base: main
-    version_bump: patch
-  docs:
-    pattern: "docs/(.+)"
-    base: main
-    version_bump: null
-```
-
-### Trunk-Based Strategy
-
-```yaml
-branching_strategy: trunk
-main_branch: main
-branches:
-  feature:
-    pattern: "feature/([A-Z]+-\d+)-(.+)"
-    base: main
-    version_bump: null
-  bugfix:
-    pattern: "bugfix/([A-Z]+-\d+)-(.+)"
-    base: main
-    version_bump: null
-  release:
-    pattern: "release/(\d+\.\d+\.\d+)"
-    base: main
-    version_bump: minor
-```
-
-### Custom Patterns
-
-You can customize branch patterns to match your team's conventions:
-
-```yaml
-branches:
-  feature:
-    pattern: "feat/([A-Z]+-\d+)/(.+)"  # Custom pattern
+    pattern: ^docs/(.+)$
     base: develop
 ```
 
-## Workflow Modes
+## Configuration Schema
 
-The `workflow_mode` setting defines how branches are handled:
+The configuration schema is defined using Pydantic models and provides validation for all configuration options. Below is a detailed list of available settings:
 
-```yaml
-workflow_mode: solo  # Options: "solo" or "team"
+### Root Configuration
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `project_type` | String | `python` | Project language or framework |
+| `branching_strategy` | String | `gitflow` | Branching strategy to use |
+| `workflow_mode` | String | `solo` | Development workflow mode |
+| `main_branch` | String | `main` | Name of the main/production branch |
+| `develop_branch` | String | `develop` | Name of the development branch (required for GitFlow) |
+| `branches` | Dict | | Configuration for branch types |
+| `version` | Dict | Optional | Configuration for version management |
+| `pull_requests` | Dict | Optional | Configuration for pull requests |
+| `jira` | Dict | Optional | Configuration for Jira integration |
+| `github` | Dict | Optional | Configuration for GitHub integration |
+| `pre_commit` | Dict | Optional | Configuration for pre-commit hooks |
+| `license_headers` | Dict | Optional | Configuration for license headers |
+
+### Branch Configuration
+
+Each branch type (feature, bugfix, hotfix, release, docs) can have the following configuration:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `pattern` | String | Regex pattern for branch names |
+| `base` | String | Base branch to create from and merge to |
+| `target` | List | List of branches to merge to (for release and hotfix branches) |
+| `version_bump` | String | Type of version bump to perform (major, minor, patch, none) |
+
+### Version Configuration
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `files` | List | | List of files containing version strings |
+| `use_bumpversion` | Boolean | `true` | Whether to use bump2version for version management |
+| `bumpversion_config` | String | `.bumpversion.cfg` | Path to the bump2version configuration file |
+| `changelog` | String | `CHANGELOG.md` | Path to the changelog file |
+
+Each version file configuration requires:
+- `path`: Path to the file containing version
+- `pattern`: Regex pattern to match version string (must include a capture group)
+
+### PR Configuration
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `templates` | Dict | Templates for PR descriptions |
+| `checks` | Dict | Checks to run before PR creation |
+
+PR templates include:
+- `feature`: Template for feature PR descriptions
+- `bugfix`: Template for bugfix PR descriptions
+- `release`: Template for release PR descriptions
+- `hotfix`: Template for hotfix PR descriptions
+- `docs`: Template for documentation PR descriptions
+
+PR checks include:
+- `run_tests`: Whether to run tests before allowing PR creation
+- `run_linting`: Whether to run linting before allowing PR creation
+
+### Jira Configuration
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `enabled` | Boolean | `true` | Whether Jira integration is enabled |
+| `project_key` | String | | Jira project key |
+| `transition_to_in_progress` | Boolean | `true` | Whether to transition tickets to In Progress when creating branches |
+| `update_on_pr_creation` | Boolean | `true` | Whether to update Jira tickets when PRs are created |
+
+### GitHub Configuration
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `enabled` | Boolean | `true` | Whether GitHub integration is enabled |
+| `owner` | String | Optional | GitHub repository owner |
+| `repo` | String | Optional | GitHub repository name |
+| `create_pr` | Boolean | `true` | Whether to automatically create PRs |
+| `required_checks` | List | Optional | List of required checks for PRs |
+
+### Pre-Commit Configuration
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `hooks` | List | List of pre-commit hooks to install |
+
+### License Header Configuration
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `template` | String | License header template text |
+| `file_types` | List | Configuration for different file types |
+
+## Project Type Detection
+
+The configuration system can automatically detect the project type based on files in the project directory. This detection is used when creating default configurations.
+
+Detection rules:
+
+- **Python**: Presence of `pyproject.toml`, `setup.py`, or multiple `.py` files
+- **JavaScript**: Presence of `package.json`, `node_modules`, or multiple `.js` files
+- **TypeScript**: Presence of `tsconfig.json` or multiple `.ts` files
+- **Java**: Presence of `pom.xml`, `build.gradle`, or multiple `.java` files
+- **C#**: Presence of `.sln`, `.csproj`, or multiple `.cs` files
+- **Go**: Presence of `go.mod`, `go.sum`, or multiple `.go` files
+- **Rust**: Presence of `Cargo.toml`, `Cargo.lock`, or multiple `.rs` files
+- **Generic**: Used when no specific project type is detected
+
+## Default Configurations
+
+The system provides default configurations for different project types and branching strategies. These defaults are used when creating a new configuration file or when no configuration file exists.
+
+Default configurations include:
+
+- Branch patterns appropriate for the project
+- Version file paths specific to the project type
+- Appropriate pre-commit hooks for the language
+- License header templates for the project's file types
+
+## MCP Tools
+
+The configuration system exposes the following MCP tools:
+
+### `get_config`
+
+Gets the current project configuration.
+
+**Output Schema:**
+- `config`: Project configuration
+- `is_default`: Whether this is a default configuration
+- `path`: Path to the configuration file, or null if default
+
+Example:
+```python
+result = await call_tool("practices", "get_config", {})
+print(f"Configuration loaded from: {result['path']}")
 ```
 
-- **Solo Mode**: For single developers or small teams
-  - Branch directly from and merge directly to base branches
-  - After merging, delete both local and remote feature branches
+### `create_config`
 
-- **Team Mode**: For larger teams or more formal processes
-  - Create pull requests for all merges
-  - After PR approval and merge, delete both local and remote feature branches
+Creates a default configuration file in the project root.
 
-## Version Management
+**Input Schema:**
+- `project_type`: Project type (optional, auto-detected if not provided)
+- `overwrite`: Whether to overwrite existing configuration (default: false)
 
-Configure version file patterns for your project:
+**Output Schema:**
+- `success`: Whether the configuration was created successfully
+- `path`: Path to the created configuration file
+- `error`: Error message if the creation failed
 
-```yaml
-version:
-  files:
-    - path: src/package/__init__.py
-      pattern: __version__ = "(\d+\.\d+\.\d+)"
-    - path: package.json
-      pattern: "\"version\": \"(\d+\.\d+\.\d+)\""
-  use_bumpversion: true
-  changelog: CHANGELOG.md
+Example:
+```python
+result = await call_tool("practices", "create_config", {
+    "project_type": "typescript",
+    "overwrite": True
+})
+if result["success"]:
+    print(f"Created configuration at: {result['path']}")
+else:
+    print(f"Failed to create configuration: {result['error']}")
 ```
 
-### Version Files
+### `validate_config`
 
-Each version file entry requires:
-- `path`: Relative path to the file
-- `pattern`: Regex pattern to match the version string (with capture group)
+Validates the current project configuration.
 
-### Bumpversion Integration
+**Output Schema:**
+- `valid`: Whether the configuration is valid
+- `errors`: List of validation errors
+- `missing_files`: List of missing files referenced in configuration
 
-If you use [bump2version](https://github.com/c4urself/bump2version), enable it with:
-
-```yaml
-version:
-  use_bumpversion: true
-```
-
-This will use your `.bumpversion.cfg` configuration when bumping versions.
-
-## Jira Integration
-
-Configure Jira integration:
-
-```yaml
-jira:
-  project: PMS
-  server: jira.example.com
-  transitions:
-    in_progress: "In Progress"
-    done: "Done"
-```
-
-## GitHub Integration
-
-Configure GitHub integration:
-
-```yaml
-github:
-  owner: Agentience
-  repo: mcp_server_practices
-  base_branches:
-    develop: true
-    main: true
-```
-
-## Pre-commit Hooks
-
-Configure pre-commit hooks:
-
-```yaml
-pre_commit:
-  hooks:
-    - id: black
-      name: black
-      description: "Format Python code with Black"
-      entry: black
-      language: python
-      types: [python]
-    - id: isort
-      name: isort
-      description: "Sort Python imports"
-      entry: isort
-      language: python
-      types: [python]
-```
-
-## License Headers
-
-Configure license headers:
-
-```yaml
-license_headers:
-  template: |
-    Copyright (c) 2025 Agentience
+Example:
+```python
+result = await call_tool("practices", "validate_config", {})
+if result["valid"]:
+    print("Configuration is valid")
+else:
+    print("Configuration errors:")
+    for error in result["errors"]:
+        print(f"- {error}")
     
-    Permission is hereby granted, free of charge, to any person obtaining a copy
-    of this software and associated documentation files.
-  file_types:
-    - extension: .py
-      prefix: "# "
-    - extension: .js
-      prefix: "// "
-    - extension: .java
-      start: "/*"
-      prefix: " * "
-      end: " */"
+    if result["missing_files"]:
+        print("Missing files:")
+        for file in result["missing_files"]:
+            print(f"- {file}")
 ```
 
-## Configuration Examples
+### `detect_project_type`
 
-### Python Project Example
+Detects the project type based on files in the directory.
 
-```yaml
-project_type: python
-branching_strategy: gitflow
-workflow_mode: team
-main_branch: main
-develop_branch: develop
-jira_project: PMS
+**Output Schema:**
+- `project_type`: Detected project type
+- `confidence`: Confidence level (high, medium, low)
+- `details`: Details about the detection
 
-version:
-  files:
-    - path: src/mypackage/__init__.py
-      pattern: __version__ = "(\d+\.\d+\.\d+)"
-    - path: setup.py
-      pattern: version="(\d+\.\d+\.\d+)"
-  use_bumpversion: true
-  changelog: CHANGELOG.md
-
-jira:
-  project: PMS
-  transitions:
-    in_progress: "In Progress"
-    done: "Done"
-
-github:
-  owner: Agentience
-  repo: my_python_project
-  base_branches:
-    develop: true
-    main: true
-
-pre_commit:
-  hooks:
-    - id: black
-    - id: isort
-    - id: flake8
-    - id: mypy
+Example:
+```python
+result = await call_tool("practices", "detect_project_type", {})
+print(f"Detected project type: {result['project_type']} (confidence: {result['confidence']})")
 ```
 
-### JavaScript Project Example
+### `save_config`
 
-```yaml
-project_type: javascript
-branching_strategy: github-flow
-workflow_mode: team
-main_branch: main
-jira_project: WEB
+Saves a configuration to a file.
 
-version:
-  files:
-    - path: package.json
-      pattern: "\"version\": \"(\d+\.\d+\.\d+)\""
-  changelog: CHANGELOG.md
+**Input Schema:**
+- `config`: Configuration to save
+- `path`: Path to save the configuration to (optional)
 
-jira:
-  project: WEB
-  transitions:
-    in_progress: "In Progress"
-    done: "Done"
+**Output Schema:**
+- `success`: Whether the configuration was saved successfully
+- `path`: Path to the saved configuration file
+- `error`: Error message if the save failed
 
-github:
-  owner: Agentience
-  repo: my_js_project
-  base_branches:
-    main: true
+Example:
+```python
+config = await call_tool("practices", "get_config", {})
+config["config"]["workflow_mode"] = "team"
 
-pre_commit:
-  hooks:
-    - id: prettier
-    - id: eslint
+result = await call_tool("practices", "save_config", {
+    "config": config["config"]
+})
+if result["success"]:
+    print(f"Saved configuration to: {result['path']}")
+else:
+    print(f"Failed to save configuration: {result['error']}")
 ```
 
-### Java Project Example
+## Working with Configuration Files
 
-```yaml
-project_type: java
-branching_strategy: gitflow
-workflow_mode: team
-main_branch: main
-develop_branch: develop
-jira_project: API
+### Creating a New Configuration
 
-version:
-  files:
-    - path: pom.xml
-      pattern: "<version>(\d+\.\d+\.\d+)</version>"
-  changelog: CHANGELOG.md
+To create a new configuration file:
 
-jira:
-  project: API
-  transitions:
-    in_progress: "In Progress"
-    done: "Done"
+1. Use the `create_config` tool:
+   ```python
+   await call_tool("practices", "create_config", {})
+   ```
 
-github:
-  owner: Agentience
-  repo: my_java_project
-  base_branches:
-    develop: true
-    main: true
+2. Or create the file manually:
+   ```python
+   config = {
+       "project_type": "python",
+       "branching_strategy": "gitflow",
+       "workflow_mode": "solo",
+       "main_branch": "main",
+       "develop_branch": "develop",
+       "branches": {
+           "feature": {
+               "pattern": "^feature/([A-Z]+-\\d+)-(.+)$",
+               "base": "develop"
+           },
+           "bugfix": {
+               "pattern": "^bugfix/([A-Z]+-\\d+)-(.+)$",
+               "base": "develop"
+           }
+       }
+   }
+   
+   await call_tool("practices", "save_config", {"config": config})
+   ```
 
-pre_commit:
-  hooks:
-    - id: checkstyle
-    - id: spotless
+### Modifying Configuration
+
+To modify an existing configuration:
+
+1. Load the current configuration:
+   ```python
+   config_result = await call_tool("practices", "get_config", {})
+   config = config_result["config"]
+   ```
+
+2. Modify the configuration:
+   ```python
+   config["workflow_mode"] = "team"
+   config["branches"]["feature"]["pattern"] = "^feature/([A-Z]+-\\d+)_(.+)$"
+   ```
+
+3. Save the updated configuration:
+   ```python
+   await call_tool("practices", "save_config", {"config": config})
+   ```
+
+## Common Scenarios
+
+### Switching Branching Strategies
+
+To switch from GitFlow to GitHub Flow:
+
+```python
+config_result = await call_tool("practices", "get_config", {})
+config = config_result["config"]
+
+# Change to GitHub Flow
+config["branching_strategy"] = "github-flow"
+config["develop_branch"] = None  # Not needed for GitHub Flow
+
+# Update branch configurations
+for branch_type in ["feature", "bugfix", "docs", "hotfix"]:
+    if branch_type in config["branches"]:
+        config["branches"][branch_type]["base"] = "main"
+
+# Remove release branch (not typically used in GitHub Flow)
+if "release" in config["branches"]:
+    del config["branches"]["release"]
+
+await call_tool("practices", "save_config", {"config": config})
 ```
 
-## Advanced Configuration
+### Adding Jira Integration
 
-### Custom Templates
+To add or update Jira integration:
 
-You can define custom templates for PR descriptions:
+```python
+config_result = await call_tool("practices", "get_config", {})
+config = config_result["config"]
 
-```yaml
-templates:
-  pr:
-    feature: |
-      # {ticket_id}: {description}
-      
-      ## Summary
-      This PR implements {description} functionality ({ticket_id}).
-      
-      ## Changes
-      -
-      
-      ## Testing
-      -
-      
-      ## Related Issues
-      - {ticket_id}: {ticket_description}
+# Configure Jira integration
+config["jira"] = {
+    "enabled": True,
+    "project_key": "PMS",
+    "transition_to_in_progress": True,
+    "update_on_pr_creation": True
+}
+
+await call_tool("practices", "save_config", {"config": config})
 ```
 
-### Environment-Specific Settings
+### Customizing PR Templates
 
-You can use environment variables in your configuration:
+To customize PR templates:
 
-```yaml
-jira:
-  project: ${JIRA_PROJECT}
-  server: ${JIRA_SERVER}
+```python
+config_result = await call_tool("practices", "get_config", {})
+config = config_result["config"]
+
+# Ensure the PR section exists
+if "pull_requests" not in config:
+    config["pull_requests"] = {}
+
+# Ensure the templates section exists
+if "templates" not in config["pull_requests"]:
+    config["pull_requests"]["templates"] = {}
+
+# Set up a custom feature PR template
+config["pull_requests"]["templates"]["feature"] = """
+# {ticket_id}: {description}
+
+## Summary
+This PR implements {description} functionality ({ticket_id}).
+
+## Changes
+- 
+
+## How to Test
+1. 
+2. 
+
+## Screenshots
+(Add screenshots here)
+
+## Related Issues
+- {ticket_id}: {ticket_description}
+"""
+
+await call_tool("practices", "save_config", {"config": config})
 ```
 
-These will be replaced with the corresponding environment variables at runtime.
+## Troubleshooting
+
+### Configuration Validation Errors
+
+If you receive validation errors, check the following:
+
+1. **Missing required fields**: Ensure all required fields are present in your configuration.
+2. **Invalid branching strategy**: For GitFlow, ensure `develop_branch` is specified.
+3. **Invalid regex patterns**: Ensure all branch patterns are valid regular expressions.
+4. **Invalid version patterns**: Version patterns must include a capture group.
+5. **Missing base branches**: Base branches must be defined in the configuration.
+
+### Project Type Detection Issues
+
+If project type detection is not working as expected:
+
+1. Ensure you have the appropriate files for your project type (e.g., `package.json` for JavaScript).
+2. Use the `detect_project_type` tool to see what's being detected and why.
+3. Manually specify the project type when creating a configuration:
+   ```python
+   await call_tool("practices", "create_config", {"project_type": "typescript"})
+   ```
+
+### File Path Issues
+
+If you see messages about missing files:
+
+1. Use the `validate_config` tool to see which files are missing.
+2. Update the configuration with the correct file paths.
+3. Create any missing files that are required by the configuration.

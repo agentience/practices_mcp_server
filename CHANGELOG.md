@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Configuration system with Pydantic-based schema (PMS-29)
+  - Project type detection for different languages/frameworks
+  - Default configurations for different project types
+  - Configuration validation and file management
+  - MCP tools for configuration operations
+  - Comprehensive documentation in user and LLM guides
+
 ## [0.4.0] - 2025-03-29
 ### Added
 - Unified CLI and Server Commands (PMS-27)
