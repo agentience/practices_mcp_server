@@ -98,12 +98,18 @@ def display_config(config_schema, depth=0, hide_defaults=True):
     Display configuration in a tree-like format.
     
     Args:
-        config_schema: Configuration schema
+        config_schema: Configuration schema or dict
         depth: Indentation depth
         hide_defaults: Whether to hide default values
     """
     # Convert to dict for easier manipulation
-    config_dict = config_schema.model_dump(exclude_none=True) if hide_defaults else config_schema.model_dump()
+    if hasattr(config_schema, 'model_dump'):
+        config_dict = config_schema.model_dump(exclude_none=True) if hide_defaults else config_schema.model_dump()
+    elif isinstance(config_schema, dict):
+        config_dict = config_schema
+    else:
+        print(f"  {'  ' * depth}Unable to display: {type(config_schema)}")
+        return
     
     # Indent string
     indent = "  " * depth
