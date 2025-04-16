@@ -5,7 +5,7 @@ Branch-related tools for the MCP server.
 
 from typing import Any, Dict, List, Optional
 
-from mcp.server.fastmcp.server import TextContent
+from mcp.types import TextContent
 
 from mcp_server_practices.branch.validator import validate_branch_name as validate_branch
 from mcp_server_practices.branch.creator import create_branch as create_branch_func

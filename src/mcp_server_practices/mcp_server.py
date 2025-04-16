@@ -27,7 +27,7 @@ from typing import Any, Dict, List, Optional, Union, Tuple
 
 # Import directly from mcp package
 from mcp.server import FastMCP
-from mcp.server.fastmcp.server import TextContent
+from mcp.types import TextContent
 
 from mcp_server_practices import __version__
 from mcp_server_practices.tools import (
