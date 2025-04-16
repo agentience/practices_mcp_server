@@ -6,6 +6,28 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Changed
+- Replaced Hatch scripts with UV scripts in pyproject.toml
+- Removed dependency on Hatch for build and installation scripts
+
+## [0.5.0] - 2025-04-16
+### Added
+- Configuration system with Pydantic-based schema (PMS-29)
+  - Project type detection for different languages/frameworks
+  - Default configurations for different project types
+  - Configuration validation and file management
+  - MCP tools for configuration operations
+  - Comprehensive documentation in user and LLM guides
+
+## [0.4.0] - 2025-03-29
+### Added
+- Unified CLI and Server Commands (PMS-27)
+  - Made server mode the default behavior
+  - Added CLI functionality via 'cli' subcommand
+  - Updated branch creation parsing logic for CLI
+  - Updated documentation with new usage examples
+  - Fixed branch tool parameter to use 'ticket_id' instead of 'identifier' (PMS-26)
+
 ### Fixed
 - Added command-line argument to control logging level, default to ERROR to suppress INFO logs (PMS-21)
 - Fixed BaseModel errors in MCP tools by using keyword-only arguments (PMS-22)

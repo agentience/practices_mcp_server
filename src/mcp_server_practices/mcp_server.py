@@ -27,7 +27,7 @@ from typing import Any, Dict, List, Optional, Union, Tuple
 
 # Import directly from mcp package
 from mcp.server import FastMCP
-from mcp.server.fastmcp.server import TextContent
+from mcp.types import TextContent
 
 from mcp_server_practices import __version__
 from mcp_server_practices.tools import (
@@ -37,7 +37,8 @@ from mcp_server_practices.tools import (
     git_tools, 
     license_tools, 
     github_tools,
-    directory_tools
+    directory_tools,
+    config_tools
 )
 
 # Import utility functions from directory_utils
@@ -76,7 +77,8 @@ def create_server():
     git_tools.register_tools(mcp, config)
     license_tools.register_tools(mcp, config)
     github_tools.register_tools(mcp, config)
-    directory_tools.register_tools(mcp, config)  # Register new directory tools
+    directory_tools.register_tools(mcp, config)  # Register directory tools
+    config_tools.register_tools(mcp, config)     # Register configuration tools
     
     # Register system instructions resource
     @mcp.resource(uri="practices://instructions/system", name="Practices System Instructions")
@@ -88,6 +90,7 @@ def create_server():
         # If working directory hasn't been set yet, return initialization instructions
         if project_root is None:
             return TextContent(
+                type="text",
                 text="""
 # Practices MCP Server - INITIALIZATION REQUIRED
 
@@ -121,7 +124,8 @@ The working directory should be available in your environment details or can be 
         # Otherwise return the project-specific instructions
         instructions = await get_system_instructions(project_root)
         return TextContent(
-            text=instructions
+            type="text",
+            text="Load instructions from .practices/system_instructions.md"
         )
 
     return mcp

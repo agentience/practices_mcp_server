@@ -1,0 +1,48 @@
+# Project Patterns & Intelligence
+
+This file captures essential patterns, preferences, and project intelligence for the MCP Server Practices project. These guidelines help maintain consistency and quality throughout development.
+
+## Development Patterns
+
+- **Python Package Structure**: Follow standard Python package structure with src layout
+- **Test Organization**: Tests are organized in unit/ and integration/ directories matching the source structure
+- **Documentation**: Place user-focused docs in docs/ and LLM-specific context in docs/llm_context/
+- **MCP Server Design**: Implement tools and resources following Model Context Protocol standards
+
+## Naming Conventions
+
+- **Python Files**: Use snake_case for all Python files
+- **Classes**: Use PascalCase for class names
+- **Functions/Methods**: Use snake_case for function and method names
+- **Constants**: Use UPPER_SNAKE_CASE for constants
+- **Module Organization**: Group related functionality in dedicated modules
+
+## Project-Specific Patterns
+
+- **Tool Registration**: All MCP tools must be registered in tools.py
+- **Configuration System**: Configuration uses a multi-layered approach with validation
+- **Branch Management**: Branch naming follows conventional formats (feature/, bugfix/, etc.)
+- **Version Management**: Uses semantic versioning with bumpversion for consistency
+- **PR Templates**: Standardized PR descriptions generated from branch information
+- **License Headers**: All source files should include standard license headers
+
+## Code Quality Standards
+
+- **Test Coverage**: All functionality should have corresponding unit tests
+- **Pre-commit Hooks**: Used for code quality enforcement
+- **Documentation**: Update docs in sync with code changes
+- **Error Handling**: Use explicit error types and clear error messages
+- **Type Annotations**: Use Python type hints for function parameters and return values
+
+## Workflow Patterns
+
+- **Solo Development**: Prefer local merges over PRs when working alone
+- **Branch Strategy**: Follow GitFlow patterns with feature, bugfix, release, and hotfix branches
+- **Version Updates**: Only update versions on release and hotfix branches
+- **MCP Integration**: All tools should have comprehensive implementation and tests
+
+## Critical Implementation Details
+
+- **Working Directory**: Tools must set and use the working directory for correct operation
+- **System Instructions**: Custom system instructions are maintained in .practices/system_instructions.md
+- **CLI/Server Integration**: Both CLI and MCP server interfaces use the same core implementation
