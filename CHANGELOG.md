@@ -6,7 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Changed
+- Replaced Hatch scripts with UV scripts in pyproject.toml
+- Removed dependency on Hatch for build and installation scripts
 
+## [0.5.0] - 2025-04-16
 ### Added
 - Configuration system with Pydantic-based schema (PMS-29)
   - Project type detection for different languages/frameworks

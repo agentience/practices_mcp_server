@@ -32,7 +32,7 @@ If you want to install the package globally using UV, follow these steps to avoi
 
 ```bash
 # Clean, build, and install in one step
-hatch run install_full
+./install_full.sh
 ```
 
 This script will:
