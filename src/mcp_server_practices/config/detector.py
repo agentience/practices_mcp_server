@@ -14,6 +14,7 @@ Version: 0.2.0
 """
 
 import os
+import re
 import logging
 from pathlib import Path
 from typing import Dict, Any, Union, Optional, List, Set, Tuple
@@ -66,7 +67,7 @@ PROJECT_TYPE_INDICATORS = {
 }
 
 
-def detect_project_type(directory: Union[str, Path]) -> ProjectType:
+def detect_project_type(directory: Union[str, Path]) -> Tuple[ProjectType, float, Dict[ProjectType, float]]:
     """
     Detect the project type based on files in the directory.
     
@@ -74,58 +75,148 @@ def detect_project_type(directory: Union[str, Path]) -> ProjectType:
         directory: Project directory to analyze
         
     Returns:
-        Detected project type (defaults to GENERIC if unknown)
+        Tuple of (detected_type, confidence, scores_by_type)
     """
     directory = Path(directory).resolve()
     
     if not directory.exists() or not directory.is_dir():
         logger.warning(f"Directory does not exist or is not a directory: {directory}")
-        return ProjectType.GENERIC
+        return ProjectType.GENERIC, 0.0, {pt: 0.0 for pt in ProjectType}
     
     # Check each project type's indicators
-    scores: Dict[ProjectType, int] = {pt: 0 for pt in ProjectType}
+    raw_scores: Dict[ProjectType, int] = {pt: 0 for pt in ProjectType}
+    max_possible_scores: Dict[ProjectType, int] = {pt: 0 for pt in ProjectType}
+    matches: Dict[ProjectType, List[str]] = {pt: [] for pt in ProjectType}
     
     for project_type, indicators in PROJECT_TYPE_INDICATORS.items():
         for indicator in indicators:
+            # Track maximum possible score
+            indicator_weight = indicator.get("weight", 1)
+            max_possible_scores[project_type] += indicator_weight
+            
             if "file" in indicator and "dir" in indicator:
                 # Check for file in specific directory
                 file_path = directory / indicator["dir"] / indicator["file"]
                 if file_path.exists():
-                    scores[project_type] += 2  # Higher score for specific path matches
+                    weight = indicator.get("weight", 2)  # Higher weight for specific path matches
+                    raw_scores[project_type] += weight
+                    matches[project_type].append(f"{indicator['dir']}/{indicator['file']}")
             elif "file" in indicator:
                 # Check for file in root
                 file_path = directory / indicator["file"]
                 if file_path.exists():
-                    scores[project_type] += 2  # Higher score for specific file matches
+                    weight = indicator.get("weight", 2)  # Higher weight for specific file matches
+                    raw_scores[project_type] += weight
+                    matches[project_type].append(indicator["file"])
             elif "ext" in indicator:
                 # Count files with extension
                 ext = indicator["ext"]
                 min_count = indicator.get("min_count", 1)
+                max_count = indicator.get("max_count", 100)
+                weight_per_file = indicator.get("weight_per_file", 0.5)
+                max_weight = indicator.get("max_weight", 3)
                 
                 # Recursively find files with the extension
-                count = 0
+                matching_files = []
+                total_count = 0
+                
                 for root, _, files in os.walk(directory):
                     for file in files:
                         if file.endswith(ext):
-                            count += 1
-                            if count >= min_count:
+                            rel_path = os.path.relpath(os.path.join(root, file), directory)
+                            matching_files.append(rel_path)
+                            total_count += 1
+                            if total_count >= max_count:
                                 break
-                    if count >= min_count:
+                    if total_count >= max_count:
                         break
                 
-                if count >= min_count:
-                    scores[project_type] += 1  # Lower score for extension matches
+                if total_count >= min_count:
+                    # Calculate weight based on file count
+                    weight = min(total_count * weight_per_file, max_weight)
+                    raw_scores[project_type] += weight
+                    matches[project_type].append(f"{total_count} files with {ext}")
+            elif "content" in indicator:
+                # Check file content patterns
+                pattern = indicator["content"]
+                file_pattern = indicator.get("file_pattern", "*")
+                weight = indicator.get("weight", 2)
+                
+                # Find files matching the pattern
+                matching_files = []
+                for root, _, files in os.walk(directory):
+                    for file in files:
+                        if _file_matches_pattern(file, file_pattern):
+                            file_path = os.path.join(root, file)
+                            try:
+                                with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+                                    content = f.read()
+                                    if re.search(pattern, content):
+                                        rel_path = os.path.relpath(file_path, directory)
+                                        matching_files.append(rel_path)
+                                        raw_scores[project_type] += weight
+                                        matches[project_type].append(f"Content match in {rel_path}")
+                                        break
+                            except Exception:
+                                # Skip files that can't be read
+                                pass
+    
+    # Calculate normalized scores (0-1 range)
+    normalized_scores: Dict[ProjectType, float] = {}
+    for pt in ProjectType:
+        if max_possible_scores[pt] > 0:
+            normalized_scores[pt] = raw_scores[pt] / max_possible_scores[pt]
+        else:
+            normalized_scores[pt] = 0.0
     
     # Get the project type with the highest score
-    max_score = 0
+    max_score = 0.0
     detected_type = ProjectType.GENERIC
     
-    for project_type, score in scores.items():
+    for project_type, score in normalized_scores.items():
         if score > max_score:
             max_score = score
             detected_type = project_type
     
-    logger.info(f"Detected project type: {detected_type} (score: {max_score})")
+    # If no strong match, default to GENERIC
+    confidence = max_score
+    if confidence < 0.15:  # Confidence threshold
+        detected_type = ProjectType.GENERIC
+    
+    logger.info(f"Detected project type: {detected_type} (confidence: {confidence:.2f})")
+    for pt, match_list in matches.items():
+        if match_list:
+            logger.debug(f"{pt} indicators: {', '.join(match_list)}")
+    
+    return detected_type, confidence, normalized_scores
+
+
+def _file_matches_pattern(filename: str, pattern: str) -> bool:
+    """
+    Check if a filename matches a glob pattern.
+    
+    Args:
+        filename: Filename to check
+        pattern: Glob pattern
+        
+    Returns:
+        True if filename matches pattern
+    """
+    import fnmatch
+    return fnmatch.fnmatch(filename, pattern)
+
+
+def get_project_type(directory: Union[str, Path]) -> ProjectType:
+    """
+    Get the project type, simplified function for backward compatibility.
+    
+    Args:
+        directory: Project directory to analyze
+        
+    Returns:
+        Detected project type
+    """
+    detected_type, _, _ = detect_project_type(directory)
     return detected_type
 
 
