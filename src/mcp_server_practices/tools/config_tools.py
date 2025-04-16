@@ -96,6 +96,13 @@ def register_tools(mcp: FastMCP, config: Dict[str, Any]):
                 "path": {
                     "type": ["string", "null"],
                     "description": "Path to the configuration file, or null if default"
+                },
+                "sources": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "Configuration sources (if hierarchical loading was used)"
                 }
             }
         }
@@ -107,11 +114,30 @@ def register_tools(mcp: FastMCP, config: Dict[str, Any]):
         Returns:
             Dictionary with project configuration
         """
-        project_config = await get_project_config()
+        project_root = get_project_root()
+        
+        # Load the configuration with hierarchical sources
+        try:
+            from mcp_server_practices.config.hierarchy import load_hierarchical_config
+            project_config, sources = load_hierarchical_config(project_root)
+            source_names = [f"{i+1}. {s}" for i, s in enumerate([
+                "Default configuration",
+                *[f"Team config at {path}" for path, level in sources if level == "team"],
+                *[f"Project config at {path}" for path, level in sources if level == "project"],
+                *[f"User config at {path}" for path, level in sources if level == "user"]
+            ])]
+        except ImportError:
+            # Fallback to simple loading
+            project_config = await get_project_config()
+            source_names = ["Default configuration"]
+            if not project_config.is_default:
+                source_names.append(f"Project config at {project_config.path}")
+        
         return {
             "config": project_config.config.model_dump(),
             "is_default": project_config.is_default,
-            "path": project_config.path
+            "path": project_config.path,
+            "sources": source_names
         }
 
     @mcp.tool(
@@ -433,4 +459,208 @@ def register_tools(mcp: FastMCP, config: Dict[str, Any]):
                 "success": False,
                 "path": None,
                 "error": f"Error saving configuration: {str(e)}"
+            }
+            
+    @mcp.tool(
+        name="apply_strategy_template",
+        description="Apply a branching strategy template to the project configuration",
+        input_schema={
+            "type": "object",
+            "properties": {
+                "strategy": {
+                    "type": "string",
+                    "description": "Branching strategy to apply (gitflow, github-flow, trunk)",
+                    "enum": [s.value for s in BranchingStrategy]
+                },
+                "customize": {
+                    "type": "object",
+                    "description": "Custom overrides for the template (optional)",
+                    "default": None
+                },
+                "save": {
+                    "type": "boolean",
+                    "description": "Whether to save the configuration to a file",
+                    "default": True
+                }
+            },
+            "required": ["strategy"]
+        },
+        output_schema={
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "boolean",
+                    "description": "Whether the template was applied successfully"
+                },
+                "config": {
+                    "type": "object",
+                    "description": "Updated configuration"
+                },
+                "path": {
+                    "type": ["string", "null"],
+                    "description": "Path to the saved configuration file (if saved)"
+                },
+                "error": {
+                    "type": ["string", "null"],
+                    "description": "Error message if the operation failed"
+                }
+            }
+        }
+    )
+    async def apply_strategy_template(
+        strategy: str,
+        customize: Optional[Dict[str, Any]] = None,
+        save: bool = True
+    ) -> Dict[str, Any]:
+        """
+        Apply a branching strategy template to the project configuration.
+        
+        Args:
+            strategy: Branching strategy to apply
+            customize: Custom overrides for the template (optional)
+            save: Whether to save the configuration to a file
+            
+        Returns:
+            Dictionary with result information
+        """
+        try:
+            project_root = get_project_root()
+            if project_root is None:
+                return {
+                    "success": False,
+                    "config": None,
+                    "path": None,
+                    "error": "No project root set. Use set_working_directory first."
+                }
+            
+            # Load current configuration
+            project_config = await get_project_config()
+            config_dict = project_config.config.model_dump(exclude_none=True)
+            
+            # Get strategy template
+            try:
+                strategy_enum = BranchingStrategy(strategy)
+            except ValueError:
+                return {
+                    "success": False,
+                    "config": None,
+                    "path": None,
+                    "error": f"Invalid branching strategy: {strategy}"
+                }
+            
+            # Load strategy templates
+            from mcp_server_practices.config.templates import get_template_for_branching_strategy
+            
+            # Apply strategy template
+            strategy_template = get_template_for_branching_strategy(strategy_enum)
+            
+            # Update configuration with strategy template
+            for key, value in strategy_template.items():
+                if key == "branches":
+                    # Merge branch configurations, preserving custom branches
+                    if "branches" not in config_dict:
+                        config_dict["branches"] = {}
+                    
+                    for branch_type, branch_config in value.items():
+                        config_dict["branches"][branch_type] = branch_config
+                else:
+                    # Other keys directly override
+                    config_dict[key] = value
+            
+            # Apply custom overrides if provided
+            if customize:
+                from mcp_server_practices.config.hierarchy import _merge_dicts
+                _merge_dicts(config_dict, customize)
+            
+            # Create updated configuration
+            updated_config = ConfigurationSchema(**config_dict)
+            
+            # Save configuration if requested
+            path = None
+            if save:
+                path = save_config(
+                    config=updated_config,
+                    directory=project_root
+                )
+            
+            return {
+                "success": True,
+                "config": updated_config.model_dump(exclude_none=True),
+                "path": str(path) if path else None,
+                "error": None
+            }
+        except Exception as e:
+            logger.error(f"Error applying strategy template: {e}")
+            return {
+                "success": False,
+                "config": None,
+                "path": None,
+                "error": f"Error applying strategy template: {str(e)}"
+            }
+            
+    @mcp.tool(
+        name="create_user_config",
+        description="Create or update user-specific configuration overrides",
+        input_schema={
+            "type": "object",
+            "properties": {
+                "overrides": {
+                    "type": "object",
+                    "description": "Configuration overrides"
+                }
+            },
+            "required": ["overrides"]
+        },
+        output_schema={
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "boolean",
+                    "description": "Whether the user configuration was created successfully"
+                },
+                "path": {
+                    "type": ["string", "null"],
+                    "description": "Path to the created user configuration file"
+                },
+                "error": {
+                    "type": ["string", "null"],
+                    "description": "Error message if the creation failed"
+                }
+            }
+        }
+    )
+    async def create_user_config_tool(overrides: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Create or update user-specific configuration overrides.
+        
+        Args:
+            overrides: Configuration overrides
+            
+        Returns:
+            Dictionary with result information
+        """
+        try:
+            project_root = get_project_root()
+            if project_root is None:
+                return {
+                    "success": False,
+                    "path": None,
+                    "error": "No project root set. Use set_working_directory first."
+                }
+            
+            # Create user config
+            from mcp_server_practices.config.hierarchy import create_user_config
+            user_config_path = create_user_config(project_root, overrides)
+            
+            return {
+                "success": True,
+                "path": str(user_config_path),
+                "error": None
+            }
+        except Exception as e:
+            logger.error(f"Error creating user configuration: {e}")
+            return {
+                "success": False,
+                "path": None,
+                "error": f"Error creating user configuration: {str(e)}"
             }

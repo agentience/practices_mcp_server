@@ -124,6 +124,7 @@ def load_config(
     directory: Union[str, Path] = ".",
     config_path: Optional[Union[str, Path]] = None,
     detect_project: bool = True,
+    use_hierarchy: bool = True,
 ) -> ProjectConfig:
     """
     Load configuration from a file or use defaults.
@@ -132,6 +133,7 @@ def load_config(
         directory: Directory to search for configuration
         config_path: Explicit path to configuration file (optional)
         detect_project: Whether to detect project type if no config is found
+        use_hierarchy: Whether to use hierarchical configuration loading
         
     Returns:
         ProjectConfig with the loaded configuration
@@ -143,15 +145,45 @@ def load_config(
     # Convert paths to Path objects
     directory = Path(directory).resolve()
     
-    # Find the configuration file
-    path = None
+    # If explicit path is provided, use simple loading
     if config_path:
         path = Path(config_path)
         if not path.exists():
             raise FileNotFoundError(f"Configuration file not found: {path}")
-    else:
-        path = find_config_file(directory)
+            
+        # Load the configuration file
+        try:
+            config_dict = load_yaml_file(path)
+            logger.info(f"Loaded configuration from {path}")
+        except Exception as e:
+            logger.error(f"Error loading configuration from {path}: {e}")
+            raise ValueError(f"Invalid configuration file: {e}")
+            
+        # Validate configuration
+        try:
+            config = ConfigurationSchema(**config_dict)
+        except Exception as e:
+            logger.error(f"Invalid configuration: {e}")
+            raise ValueError(f"Invalid configuration: {e}")
+            
+        return ProjectConfig(
+            config=config,
+            path=str(path),
+            is_default=False
+        )
     
+    # Use hierarchical loading if requested
+    if use_hierarchy:
+        try:
+            from .hierarchy import load_hierarchical_config
+            project_config, _ = load_hierarchical_config(directory)
+            return project_config
+        except ImportError:
+            logger.warning("Hierarchical configuration loading not available, falling back to simple loading")
+            use_hierarchy = False
+    
+    # Simple (non-hierarchical) loading
+    path = find_config_file(directory)
     is_default = False
     config_dict = {}
     
@@ -167,9 +199,9 @@ def load_config(
         # No configuration file found, use defaults
         if detect_project:
             # Detect project type and get default configuration
-            project_type = detect_project_type(directory)
+            project_type, confidence, scores = detect_project_type(directory)
             config_dict = get_default_config(project_type)
-            logger.info(f"No configuration file found. Using defaults for {project_type}")
+            logger.info(f"No configuration file found. Using defaults for {project_type} (confidence: {confidence:.2f})")
             is_default = True
         else:
             # Use Python defaults
