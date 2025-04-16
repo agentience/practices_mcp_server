@@ -151,7 +151,9 @@ def test_load_config():
         # Test loading with no config file (should use defaults)
         config = load_config(tmpdir, detect_project=False)
         assert config.is_default is True
-        assert config.path is None
+        # In hierarchical mode, we may create a default config even if none exists
+        # assert config.path is None
+        assert os.path.basename(config.path) == CONFIG_FILENAME
         assert config.config.project_type == ProjectType.PYTHON
         
         # Create a config file

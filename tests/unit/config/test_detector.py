@@ -46,7 +46,7 @@ def test_detect_project_type():
             f.write("# Main module\n")
             
         # Detect project type
-        detected_type = detect_project_type(python_dir)
+        detected_type, confidence, scores = detect_project_type(python_dir)
         assert detected_type == ProjectType.PYTHON
         
         # Test JavaScript project detection
@@ -67,7 +67,7 @@ def test_detect_project_type():
             f.write("// Utils module\n")
             
         # Detect project type
-        detected_type = detect_project_type(js_dir)
+        detected_type, confidence, scores = detect_project_type(js_dir)
         assert detected_type == ProjectType.JAVASCRIPT
         
         # Test TypeScript project detection
@@ -88,7 +88,7 @@ def test_detect_project_type():
             f.write("// Utils module\n")
             
         # Detect project type
-        detected_type = detect_project_type(ts_dir)
+        detected_type, confidence, scores = detect_project_type(ts_dir)
         assert detected_type == ProjectType.TYPESCRIPT
         
         # Test empty directory
@@ -96,7 +96,7 @@ def test_detect_project_type():
         os.makedirs(empty_dir, exist_ok=True)
         
         # Detect project type
-        detected_type = detect_project_type(empty_dir)
+        detected_type, confidence, scores = detect_project_type(empty_dir)
         assert detected_type == ProjectType.GENERIC
 
 
