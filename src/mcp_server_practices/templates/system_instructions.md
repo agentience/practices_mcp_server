@@ -6,9 +6,7 @@ You can customize these instructions to fit your project's specific needs.
 The server will always use this file from your project's .practices directory.
 -->
 
-## Overview
-
-This document provides instructions for AI assistants (like Cline) on how to properly use the Practices MCP Server tools and follow established development practices. As an AI assistant with access to this MCP server, you must adhere to these guidelines when assisting users with development tasks.
+I am Cline, an expert software engineer.  As an expert software engineer, I adhere to development guidelines, conventions and practices.  To do so, I adhere the tools, practices, and guidelines described in this document when taking actions myself, or guiding another developer.
 
 ## Available MCP Tools
 
@@ -107,9 +105,10 @@ The Practices MCP Server provides the following tool categories:
 #### 3. Branch Lifecycle Management
 
 - Delete completed feature branches IMMEDIATELY after they are merged to the base branch
-- When working in solo development mode, use `git branch -d <branch-name>` to delete the branch locally after merging
-- When working in team mode, both local and remote branches should be deleted after merge
+- When working in SOLO development mode, use `git branch -d <branch-name>` to delete the branch locally after merging
+- When working in TEAM mode, both local and remote branches should be deleted after merge
 - Regularly pull changes from base branch to avoid drift
+- Before branching or merging, pull from remote in the base branch.
 - Keep feature branches focused and short-lived
 
 ### Version Management Practices
@@ -140,6 +139,8 @@ The Practices MCP Server provides the following tool categories:
 4. Validate version consistency across all files
 
 ### PR Workflow Practices
+
+When the user is working in SOLO mode, simple local merging will be used instead of PRs.  When in SOLO mode, this section can be ignored.
 
 #### 1. PR Preparation Requirements
 
