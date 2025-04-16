@@ -154,7 +154,8 @@ def test_load_config():
         # In hierarchical mode, we may create a default config even if none exists
         # assert config.path is None
         assert os.path.basename(config.path) == CONFIG_FILENAME
-        assert config.config.project_type == ProjectType.PYTHON
+        # With detection disabled, it defaults to GENERIC
+        assert config.config.project_type == ProjectType.GENERIC
         
         # Create a config file
         config_path = os.path.join(tmpdir, CONFIG_FILENAME)
